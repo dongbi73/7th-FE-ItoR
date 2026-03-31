@@ -17,15 +17,33 @@ export const Header = () => {
 
         {/* 데스크탑 메뉴 (md 이상에서만 노출) */}
         <nav className="hidden items-center gap-6 md:flex">
-          <Link to="/" className="text-sm font-medium text-gray-600 hover:text-blue-600">홈</Link>
-          <Link to="/write" className="text-sm font-medium text-gray-600 hover:text-blue-600">글쓰기</Link>
+          {/* 검색바 */}
+          <div className="relative group mr-2">
+            <input 
+              type="text" 
+              placeholder="Search posts..." 
+              className="w-40 lg:w-48 rounded-full bg-gray-100 border-none py-1.5 pl-9 pr-4 text-xs transition-all duration-300 focus:w-64 focus:bg-white focus:ring-2 focus:ring-blue-500/10 outline-none"
+            />
+            <svg 
+              className="absolute left-3 top-2 h-4 w-4 text-gray-400 transition-colors group-focus-within:text-blue-500" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+
+          <Link to="/" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">홈</Link>
+          <Link to="/write" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">글쓰기</Link>
           
-          <div className="ml-4 flex items-center gap-2">
+          <div className="ml-4 flex items-center gap-2 border-l pl-6 border-gray-100">
             <Link to="/login">
-              <Button variant="outline" size="sm">로그인</Button>
+              <Button variant="outline" size="sm" className="rounded-full px-5 border-gray-200">로그인</Button>
             </Link>
             <Link to="/signup">
-              <Button size="sm">회원가입</Button>
+              <Button size="sm" className="rounded-full px-5">회원가입</Button>
             </Link>
           </div>
         </nav>
@@ -50,16 +68,28 @@ export const Header = () => {
         "absolute left-0 top-16 w-full border-b bg-white p-4 transition-all duration-300 md:hidden",
         isMenuOpen ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0 pointer-events-none"
       )}>
-        <nav className="flex flex-col gap-4">
-          <Link to="/" className="text-base font-medium text-gray-600" onClick={() => setIsMenuOpen(false)}>홈</Link>
-          <Link to="/write" className="text-base font-medium text-gray-600" onClick={() => setIsMenuOpen(false)}>글쓰기</Link>
-          <hr />
-          <div className="flex flex-col gap-2">
+        {/* 검색바 */}
+        <div className="relative mb-6">
+          <input 
+            type="text" 
+            placeholder="Search..." 
+            className="w-full rounded-xl bg-gray-100 border-none py-3 pl-11 pr-4 text-sm outline-none"
+          />
+          <svg className="absolute left-4 top-3.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+
+        <nav className="flex flex-col gap-5">
+          <Link to="/" className="text-ld font-bold text-gray-900" onClick={() => setIsMenuOpen(false)}>홈</Link>
+          <Link to="/write" className="text-lg font-bold text-gray-900" onClick={() => setIsMenuOpen(false)}>글쓰기</Link>
+          <hr className="border-gray-100" />
+          <div className="flex flex-col gap-3">
             <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-              <Button variant="outline" className="w-full">로그인</Button>
+              <Button variant="outline" className="w-full rounded-xl py-6">로그인</Button>
             </Link>
             <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
-              <Button className="w-full">회원가입</Button>
+              <Button className="w-full rounded-xl py-6">회원가입</Button>
             </Link>
           </div>
         </nav>
