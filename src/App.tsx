@@ -1,18 +1,10 @@
 // src/App.tsx
-import { Outlet } from 'react-router-dom'
+import { RouterProvider } from 'react-router-dom';
+import { router } from '@/router/Router';
 
 function App() {
-  return (
-    <div className="app-layout">
-      {/* 상단바(Nav)*/}
-      
-      <main>
-        <Outlet /> {/* Home.tsx 내용 */}
-      </main>
 
-      {/* 푸터(Footer)*/}
-    </div>
-  )
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;
