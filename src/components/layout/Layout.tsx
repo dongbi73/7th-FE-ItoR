@@ -8,7 +8,7 @@ export const Layout = () => {
       <Header />
       
       {/* 본문 */}
-      <main className="mx-auto max-w-[1200px] px-4 py-8 md:px-8">
+      <main className="mx-auto max-w-300 px-4 py-8 md:px-8">
         {/* Outlet */}
         <Outlet />
       </main>

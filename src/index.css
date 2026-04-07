@@ -1,1 +1,35 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Smooch&display=swap');
+@theme {
+  --font-smooch: "Smooch", cursive;
+  /* Text Field 전용 상태별 색상 */
+  --color-field-border: #E0E0E0;      
+  --color-field-bg: #FFFFFF;           
+  
+  --color-field-hover-bg: #F5F5F5;     
+  
+  --color-field-focus-border: #007AFF;
+  --color-field-focus-ring: #B3D7FF;  
+  
+  --color-field-error-border: #FF3B30; 
+  --color-field-error-text: #FF3B30; 
+  
+  --color-field-disabled-bg: #F0F0F0;  
+  --color-field-disabled-text: #A0A0A0; 
+  
+  --color-text-label: #333333;       
+  --color-text-placeholder: #A0A0A0;  
+
+  /* Button 전용 색상 */
+  --color-btn-primary: #00A1FF;
+  --color-btn-primary-hover: #00A1FF; 
+  
+  --color-btn-gray-bg: #F5F5F5;      
+  --color-btn-gray-border: #E0E0E0; 
+  --color-btn-gray-text: #333333;
+  
+  --color-btn-black-bg: #1A1A1A;
+  
+  --color-btn-disabled-bg: #F0F0F0;
+  --color-btn-disabled-text: #A0A0A0;
+}
