@@ -1,12 +1,18 @@
 export const pageButtonBase = `
   flex items-center justify-center 
-  w-[32px] h-[32px] 
-  text-[14px] font-semibold 
-  bg-white border transition-all duration-200 rounded-[1px]
-  disabled:opacity-30 disabled:cursor-not-allowed
+  px-[7px] py-[1px] rounded-[2px]
+  text-[14px] font-regular 
+  bg-white border border-gray-85 transition-colors duration-200 
+  disabled:border-gray-85 disabled:text-gray-85 disabled:cursor-not-allowed 
 `;
 
-export const pageButtonVariants = {
-  default: 'border-slate-200 text-slate-700 hover:bg-slate-50',
-  active: 'border-[#1890FF] text-[#1890FF] z-10',
-};
+export const navButton = `
+  text-pagination-text px-2.5 py-2.5
+  hover:border-pagination-active hover:text-pagination-active
+`;
+
+export const numButton = `
+  hover:border-pagination-active hover:text-pagination-active
+
+`; 
+

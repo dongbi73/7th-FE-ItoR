@@ -1,0 +1,102 @@
+import { apiFetch, createApiUrl, requestTokenReissue } from '@/api/http';
+
+export interface ReissueData {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface BaseResponse<T> {
+  code: number;
+  message: string;
+  data: T;
+}
+
+export interface LoginData {
+  accessToken: string;
+  refreshToken: string;
+  nickname: string;
+  profilePicture: string;
+  introduction: string;
+  httpStatus: string;
+  responseMessage: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  nickname: string;
+  password?: string;
+  profilePicture: string;
+  birthDate: string;
+  name: string;
+  introduction: string;
+  kakaoId?: number;
+}
+
+export interface RegisterData {
+  email: string;
+  nickname: string;
+  profilePicture: string;
+  introduction: string;
+}
+
+export interface KakaoRedirectData {
+  httpStatus: string;
+  responseMessage: string;
+}
+
+export type ReissueResponse = BaseResponse<ReissueData>;
+export type LoginResponse = BaseResponse<LoginData>;
+export type KakaoLoginUrlResponse = BaseResponse<string>;
+export type KakaoRedirectResponse = BaseResponse<KakaoRedirectData>;
+export type RegisterResponse = BaseResponse<RegisterData>;
+
+export const reissueToken = async (): Promise<ReissueResponse> => {
+  try {
+    return await requestTokenReissue();
+  } catch (error) {
+    console.error('토큰 재발급 실패:', error);
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    window.location.href = '/login';
+
+    return {
+      code: 401,
+      message: '세션이 만료되었습니다. 다시 로그인해주세요.',
+      data: { accessToken: '', refreshToken: '' },
+    };
+  }
+};
+
+export const loginWithEmail = async (
+  email: string,
+  password: string,
+): Promise<LoginResponse> => {
+  return apiFetch<LoginResponse>('/auth/login', {
+    method: 'POST',
+    body: { email, password },
+  });
+};
+
+export const getKakaoLoginUrl = (): string => {
+  return createApiUrl('/auth/kakao');
+};
+
+export const loginWithKakao = async (code: string): Promise<KakaoRedirectResponse> => {
+  return apiFetch<KakaoRedirectResponse>('/auth/kakao/redirect', {
+    params: { code },
+  });
+};
+
+export const registerUser = async (data: RegisterRequest): Promise<RegisterResponse> => {
+  return apiFetch<RegisterResponse>('/auth/register', {
+    method: 'POST',
+    body: data,
+  });
+};
+
+export const registerOAuthUser = async (data: RegisterRequest): Promise<RegisterResponse> => {
+  return apiFetch<RegisterResponse>('/auth/register-oauth', {
+    method: 'POST',
+    body: data,
+  });
+};

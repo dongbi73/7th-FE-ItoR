@@ -16,6 +16,6 @@ export const toastBase = `
 `;
 
 export const toastVariants = {
-  error: 'border-[#FF3F3F] text-[#FF3F3F]',
-  success: 'border-[#15DC5E] text-[#15DC5E]',
+  error: 'border-negative text-negative',
+  success: 'border-success text-success',
 };

@@ -10,3 +10,5 @@ export { default as FolderOpenIcon } from './folder_open.svg?react';
 export { default as ChatIcon } from './chat.svg?react';
 export { default as SettingsIcon } from './settings.svg?react';
 export { default as ErrorOutlineIcon } from './error_outline.svg?react';
+export { default as KakaoLogoIcon } from './kakaologo.svg?react';
+export { default as GITLOG } from './GITLOG.svg?react';

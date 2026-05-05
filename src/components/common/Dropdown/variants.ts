@@ -1,30 +1,43 @@
-export const dropdownContainer = 'absolute z-[100] bg-white rounded shadow-xl border border-slate-100 mt-2.5 animate-in fade-in zoom-in-95 duration-150';
 import { cn } from '@/utils/cn';
 
-export const containerVariants = {
-  default: 'w-[160px] py-1', 
-  iconOnly: 'w-[72px] py-1 flex items-center justify-center' 
+export const dropdownContainer =
+  'absolute z-[100] border border-border-light bg-white shadow-[0_4px_12px_var(--color-shadow-dropdown)] animate-in fade-in zoom-in-95 duration-150';
+
+export const positionVariants = {
+  bottom: 'top-full mt-4 left-1/2 -translate-x-1/2',
+  top: 'bottom-full mb-4 left-1/2 -translate-x-1/2'
 };
+export const containerVariants = {
+  default: 'py-1 rounded-[4px] ',
+  iconOnly: 'rounded-[4px] px-4 py-1 flex items-center justify-center'
+};
+
+
+
 const caretBase = `
   before:content-[""] 
   before:absolute 
-  before:-top-2 
-  before:w-0 
-  before:h-0 
-  before:border-l-[8px] before:border-l-transparent 
-  before:border-r-[8px] before:border-r-transparent 
-  before:border-b-[8px] before:border-b-white
-  before:drop-shadow-[0_-2px_2px_rgba(0,0,0,0.05)]
+  before:w-4
+  before:h-4
+  before:bg-white
+  before:rotate-45
+  before:border-border-light
 `;
-
 export const caretVariants = {
-  default: cn(caretBase, 'before:right-6'),
-  iconOnly: cn(caretBase, 'before:left-1/2 before:-translate-x-1/2')
+  bottom: {
+    default: cn(caretBase, 'before:-top-2 before:right-3 before:border-t before:border-l'),
+    iconOnly: cn(caretBase, 'before:-top-2 before:left-1/2 before:-translate-x-1/2 before:border-t before:border-l')
+  },
+  top: {
+    default: cn(caretBase, 'before:-bottom-2 before:right-3 before:border-b before:border-r'),
+    iconOnly: cn(caretBase, 'before:-bottom-2 before:left-1/2 before:-translate-x-1/2 before:border-b before:border-r')
+  }
 };
 
-export const itemBase = 'w-full flex items-center transition-colors hover:bg-[#E6E6E6] leading-none rounded-none';
+export const itemBase =
+  'flex w-full items-center leading-none transition-colors';
 
 export const itemVariants = {
-  default: 'w-[160px] h-[42px] px-4 justify-start text-[14px] font-medium text-slate-700',
-  iconOnly: 'w-[72px] h-[40px] px-4 justify-center'
+  default: 'px-3 pt-2 pb-3 w-40 justify-start gap-2.5 text-[14px] font-normal text-black',
+  iconOnly: 'h-[32px] px-4 justify-center'
 };

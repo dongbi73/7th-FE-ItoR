@@ -1,19 +1,18 @@
 import { Outlet } from 'react-router-dom';
-import { Header } from './Header'; 
+import { Header } from './Header';
+import { ToastRenderer } from '@/components/common/Toast';
 
 export const Layout = () => {
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-white text-gray-900">
       {/* 헤더 */}
       <Header />
-      
+      <ToastRenderer />
+
       {/* 본문 */}
-      <main className="mx-auto max-w-300 px-4 py-8 md:px-8">
-        {/* Outlet */}
+      <main className="pt-18">
         <Outlet />
       </main>
-
-      {/* Footer */}
     </div>
   );
 };

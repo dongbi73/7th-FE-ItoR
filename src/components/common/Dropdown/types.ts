@@ -7,11 +7,13 @@ export interface DropdownProps {
   className?: string;       
   hasCaret?: boolean;       
   isIconOnly?: boolean;
+  position?: 'top' | 'bottom';
 }
 
 export interface DropdownItemProps {
   children?: ReactNode;      
-  onClick?: (e: MouseEvent<HTMLButtonElement>) => void; 
+  onClick?: (e: MouseEvent<HTMLElement>) => void; 
   className?: string;       
   icon?: ElementType;       
+  asChild?: boolean;
 }

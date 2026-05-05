@@ -1,7 +1,7 @@
 export const avatarBase = `
   flex items-center justify-center 
   rounded-full 
-  bg-[#1A1A1A] 
+  bg-gray-10 
   text-white 
   overflow-hidden 
   flex-shrink-0

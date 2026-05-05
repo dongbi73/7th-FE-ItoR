@@ -1,6 +1,8 @@
-export const modalOverlay = 'fixed inset-0 z-[200] bg-black/60 flex items-center justify-center p-5';
-export const modalContent = 'bg-white rounded-md shadow-md border-gray-100 w-full max-w-[340px] overflow-hidden animate-in fade-in zoom-in-95 duration-200';
-export const modalHeaderBase = 'p-5 pb-5 flex flex-col gap-3 text-left';
-export const modalTitleBase = 'text-[14px] font-medium text-slate-900 leading-snug';
-export const modalDescriptionBase = 'text-[12px] font-light text-slate-500 leading-relaxed';
-export const modalFooterBase = 'p-5 pt-2 flex gap-4';
+export const modalOverlay =
+  'fixed inset-0 z-[200] flex items-center justify-center bg-modal-overlay/30 backdrop-blur-[4px] ';
+export const modalContent =
+  'w-81.5 flex flex-col gap-6 px-4 pt-6 pb-4 overflow-hidden rounded-[4px] bg-white shadow-[0_2px_8px_var(--color-shadow-soft)] animate-in fade-in zoom-in-95 duration-200';
+export const modalHeaderBase = 'flex flex-col gap-2 px-1 text-left';
+export const modalTitleBase = 'text-[14px] font-normal';
+export const modalDescriptionBase = 'text-[12px] font-normal leading-7 text-gray-56';
+export const modalFooterBase = 'flex gap-3 ';
