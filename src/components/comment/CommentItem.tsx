@@ -53,7 +53,7 @@ export const CommentItem = ({ comment, isLoggedIn, onDelete, onUpdate }: Comment
   };
 
   return (
-    <div className="w-172">
+    <div className="w-full max-w-172">
       <div className="relative">
         <PostMeta
           variant="comment"
@@ -83,9 +83,9 @@ export const CommentItem = ({ comment, isLoggedIn, onDelete, onUpdate }: Comment
               value={editText}
               onChange={(event) => setEditText(event.target.value)}
               aria-label="댓글 수정"
-              className="border-gray-90 text-gray-20 min-h-22.5 w-full resize-none rounded-sm border px-4 py-3 text-[14px] leading-relaxed font-light outline-none"
+              className="border-gray-90 text-gray-20 min-h-22.5 w-full resize-none rounded-sm border px-4 py-3 text-[14px] leading-relaxed font-light outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-btn-primary"
             />
-            <div className="mt-2 flex justify-end gap-2">
+            <div className="mt-2 flex flex-wrap justify-end gap-2">
               <Button
                 variant="grayOutline"
                 className="h-8 rounded-[25px] px-3 text-[13px]"
@@ -103,7 +103,7 @@ export const CommentItem = ({ comment, isLoggedIn, onDelete, onUpdate }: Comment
             </div>
           </div>
         ) : (
-          <p className="text-gray-20 px-4 py-3 text-[14px] leading-relaxed font-light">
+          <p className="text-gray-20 break-words px-4 py-3 text-[14px] leading-relaxed font-light">
             {comment.content}
           </p>
         )}

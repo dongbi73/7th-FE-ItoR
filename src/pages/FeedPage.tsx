@@ -23,7 +23,7 @@ const FeedPage = () => {
   const totalPages = data?.pageMax ?? 1;
 
   return (
-    <div className="mx-auto max-w-172">
+    <div className="mx-auto w-full max-w-172">
       <Blank size="md" />
 
       {isLoading ? (

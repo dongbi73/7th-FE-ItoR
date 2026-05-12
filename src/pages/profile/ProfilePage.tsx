@@ -13,7 +13,7 @@ const ProfilePage = () => {
   return (
     <div>
       <section className="bg-gray-96">
-        <div className="mx-auto max-w-172">
+        <div className="mx-auto w-full max-w-172">
           <Blank size="lg"/>
           
           <div className="px-4 py-3">

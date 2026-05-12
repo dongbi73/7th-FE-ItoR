@@ -11,7 +11,7 @@ import { useAuthModal } from '@/context/AuthModalContext';
 import { useMeQuery } from '@/hooks/queries/useUserQueries';
 
 interface HeaderProps {
-  type?: 'main' | 'detail' | 'edit' | 'profileView' | 'profileEdit';
+  type?: 'main' | 'plain' | 'detail' | 'edit' | 'profileView' | 'profileEdit';
   onPublish?: () => void;
   onDelete?: () => void;
   preview?: boolean;

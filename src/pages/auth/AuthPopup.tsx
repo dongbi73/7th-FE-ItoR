@@ -63,7 +63,7 @@ export const AuthPopup = ({ onClose, onUnregistered }: AuthPopupProps) => {
   return (
     <>
       <div className="flex items-center justify-center">
-        <div className="bg-gray-7 relative flex w-195.5 overflow-hidden rounded-[9px] py-20 shadow-[0_20px_50px_var(--color-shadow-popup)]">
+        <div className="bg-gray-7 relative flex w-full max-w-195.5 flex-col overflow-hidden rounded-[9px] py-12 shadow-[0_20px_50px_var(--color-shadow-popup)] md:flex-row md:py-20">
           <IconButton
             icon={<ClearIcon />}
             size="frame"
@@ -128,7 +128,7 @@ export const AuthPopup = ({ onClose, onUnregistered }: AuthPopupProps) => {
               </div>
             </form>
 
-            <div className="mx-auto flex w-78.25 items-center justify-center">
+            <div className="mx-auto flex w-full max-w-78.25 items-center justify-center">
               <div className="border-gray-20 w-30.75 border-t" />
               <span className="text-gray-56 px-2 pt-0.5 pb-1 text-[12px] font-medium whitespace-nowrap">
                 SNS

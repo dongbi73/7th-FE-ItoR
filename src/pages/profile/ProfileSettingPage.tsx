@@ -122,7 +122,7 @@ const ProfileSettingPage = () => {
       />
 
       <section className="bg-gray-96">
-        <div className="mx-auto max-w-160">
+        <div className="mx-auto w-full max-w-160">
           <Blank size="lg" />
           <div className="px-4 py-3">
             <Avatar
@@ -166,7 +166,7 @@ const ProfileSettingPage = () => {
         </div>
       </section>
 
-      <section className="mx-auto max-w-160">
+      <section className="mx-auto w-full max-w-160">
         <Blank size="md" />
         {isKakao && (
           <TextField value="카카오 로그인" disabled label="소셜 로그인" autoComplete="off" />

@@ -353,7 +353,7 @@ export const WritePage = () => {
                       : ''
                   }
                   rows={1}
-                  className="text-gray-20 placeholder:text-gray-56 min-h-11 resize-none gap-2.5 overflow-hidden px-4 py-3 text-[14px] font-light outline-none"
+                  className="text-gray-20 placeholder:text-gray-56 min-h-11 resize-none gap-2.5 overflow-hidden px-4 py-3 text-[14px] font-light outline-none focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-btn-primary"
                 />
               );
             }
@@ -389,7 +389,11 @@ export const WritePage = () => {
                     hasCaret={true}
                   >
                     <Dropdown.Item asChild onClick={() => handleDeleteBlock(block.id)}>
-                      <IconButton icon={<DeleteForeverIcon />} size="frame" />
+                      <IconButton
+                        icon={<DeleteForeverIcon />}
+                        size="frame"
+                        aria-label="이미지 삭제"
+                      />
                     </Dropdown.Item>
                   </Dropdown>
                 </div>

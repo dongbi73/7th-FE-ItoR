@@ -196,7 +196,7 @@ const PostDetailPage = () => {
       <div className="flex flex-col items-center justify-center">
         <Blank size="lg" />
 
-        <section className="w-172 py-3">
+        <section className="w-full max-w-172 py-3">
           <div className="flex flex-col gap-3 px-4 py-3">
             <h1 className="text-[32px] leading-tight font-medium">{post.title}</h1>
             <p className="text-gray-20 text-[14px] font-light">{post.introduction}</p>
@@ -213,7 +213,7 @@ const PostDetailPage = () => {
 
       <hr className="w-full border-0 border-t border-divider" />
 
-      <main className="mx-auto max-w-172">
+      <main className="mx-auto w-full max-w-172">
         <Blank size="md" />
 
         <section>
@@ -249,7 +249,7 @@ const PostDetailPage = () => {
 
         <Blank size="md" />
 
-        <section ref={commentRef} className="mx-auto max-w-172" aria-label="댓글">
+        <section ref={commentRef} className="mx-auto w-full max-w-172" aria-label="댓글">
           <h3 className="gap-10 px-4 pt-4 pb-3 text-[16px] font-medium">
             댓글 <span className="text-btn-primary">{post.comments.length}</span>
           </h3>
@@ -300,7 +300,7 @@ const PostDetailPage = () => {
           </div>
 
           <div className="flex flex-col items-start gap-3 px-4 py-3">
-            <h3 className="text-[32px] font-medium">{post.nickName}</h3>
+            <h3 className="wrap-break-word text-[32px] font-medium">{post.nickName}</h3>
             <p className="text-gray-20 text-[14px] font-light">{post.introduction}</p>
           </div>
           <Blank size="lg" />

@@ -3,6 +3,7 @@ import { cn } from '@/utils/cn';
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon: ReactNode;
+  'aria-label': string;
   isActive?: boolean;
   size?: 'frame' | 'md' | 'sm';
 }
@@ -26,7 +27,7 @@ export const IconButton = ({
       type={type ?? 'button'}
       className={cn(
         'inline-flex items-center justify-center rounded-xs border border-transparent bg-transparent text-gray-27 transition-colors',
-        'hover:bg-gray-95',
+        'hover:bg-gray-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-btn-primary',
         isActive && 'bg-gray-90',
         sizeClasses[size],
         className

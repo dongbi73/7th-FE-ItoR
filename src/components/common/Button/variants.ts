@@ -5,6 +5,7 @@ export const buttonBase = `
   transition-colors duration-150
   disabled:cursor-not-allowed
   flex-shrink-0
+  focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-btn-primary
 `;
 
 export const buttonVariants = {

@@ -64,11 +64,11 @@ Dropdown.Item = ({
 }: DropdownItemProps & { isIconOnly?: boolean }) => {
   
   if (asChild && React.isValidElement(children)) {
-    return (
-      <div className={cn("flex items-center justify-center", className)} onClick={onClick}>
-        {children}
-      </div>
-    );
+    return React.cloneElement(children as React.ReactElement<any>, {
+      role: 'menuitem',
+      className: cn((children.props as { className?: string }).className, className),
+      onClick,
+    });
   }
   return (
   <button 

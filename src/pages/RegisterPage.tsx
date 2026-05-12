@@ -100,10 +100,10 @@ const RegisterPage = () => {
 
   return (
     <>
-      <Header type="main" />
+      <Header type="plain" />
 
       <div className="bg-gray-96 flex w-full items-center justify-center">
-        <div className="flex w-172 flex-col">
+        <div className="flex w-full max-w-172 flex-col">
           <Blank size="md" />
           <div className="flex flex-col gap-3 px-4 py-3">
             <h1 className="text-[32px] font-medium">회원가입</h1>
@@ -120,8 +120,8 @@ const RegisterPage = () => {
 
       {step === 'select' ? (
         <div className="flex w-full flex-1 items-center justify-center">
-          <div className="flex h-91.5 w-195.5">
-            <div className="flex flex-1 flex-col items-center justify-center">
+          <div className="flex min-h-91.5 w-full max-w-195.5 flex-col px-4 md:flex-row">
+            <div className="flex flex-1 flex-col items-center justify-center py-8 md:py-0">
               <div className="flex h-40 w-77 items-center justify-center">
                 <h2 className="font-smooch h-19 w-70.75 text-[84px] leading-none font-normal select-none">
                   GITLOG
@@ -134,7 +134,7 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            <div className="flex flex-1 flex-col items-center justify-center gap-0.5 px-4">
+            <div className="flex flex-1 flex-col items-center justify-center gap-0.5 px-0 pb-8 md:px-4 md:pb-0">
               <div className="h-8.25" />
               <div className="flex w-full flex-col gap-2.5 px-4 py-1">
                 <Button
@@ -145,7 +145,7 @@ const RegisterPage = () => {
                   이메일로 회원가입
                 </Button>
 
-                <div className="relative mx-auto flex w-78.25 items-center justify-center">
+                <div className="relative mx-auto flex w-full max-w-78.25 items-center justify-center">
                   <div className="border-gray-96 absolute w-full border-t" />
                   <span className="text-gray-56 relative bg-white px-2 pt-0.5 pb-1 text-[12px] font-medium">
                     또는

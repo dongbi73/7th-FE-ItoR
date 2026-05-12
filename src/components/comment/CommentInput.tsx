@@ -57,7 +57,7 @@ export const CommentInput = ({
         onChange={(e) => setCommentText(e.target.value)}
         placeholder="댓글을 입력하세요"
         aria-label="댓글 입력"
-        className="text-gray-20 h-28 w-full resize-none px-4 py-3 text-[14px] leading-snug font-light outline-none placeholder:text-gray-56"
+        className="text-gray-20 h-28 w-full resize-none px-4 py-3 text-[14px] leading-snug font-light outline-none placeholder:text-gray-56 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-btn-primary"
       />
 
       <Divider className="mx-auto" />
