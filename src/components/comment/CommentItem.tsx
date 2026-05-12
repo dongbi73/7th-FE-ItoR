@@ -103,7 +103,7 @@ export const CommentItem = ({ comment, isLoggedIn, onDelete, onUpdate }: Comment
             </div>
           </div>
         ) : (
-          <p className="text-gray-20 break-words px-4 py-3 text-[14px] leading-relaxed font-light">
+          <p className="text-gray-20 wrap-break-word px-4 py-3 text-[14px] leading-relaxed font-light">
             {comment.content}
           </p>
         )}
