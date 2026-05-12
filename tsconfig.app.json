@@ -5,10 +5,11 @@
     "useDefineForClassFields": true,
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "types": ["vite/client"],
+    "types": ["vite/client", "vite-plugin-svgr/client"],
     "skipLibCheck": true,
+    "paths": {  "@/*": ["./src/*"] },
+  
 
-    /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
@@ -16,19 +17,17 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    // 경로 별칭 설정
-    "baseUrl": ".", 
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-
-    /* Linting */
+    
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
-  },
-  "include": ["src"]
+    },
+  "include": [
+    "src",
+    "src/**/*.ts", 
+    "src/**/*.tsx", 
+    "src/vite-env.d.ts"]
 }

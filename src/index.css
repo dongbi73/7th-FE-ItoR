@@ -1,1 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Smooch&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --font-smooch: "Smooch", cursive;
+  --font-apple: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+
+  --color-btn-primary: #00A1FF;
+  
+  --color-negative: #FF3F3F;
+  --color-success: #15DC5E;
+  
+  --color-kakao: #FEE500;
+  
+  --color-divider: #EDEDED;
+  
+  --color-border-light: #F3F3F3;
+
+  --color-modal-overlay: #B6B6B6;
+
+  --color-shadow-soft: rgba(0, 0, 0, 0.1);
+  --color-shadow-dropdown: rgba(0, 0, 0, 0.12);
+  --color-shadow-popup: rgba(0, 0, 0, 0.3);
+
+  --color-gray-0: #000000;
+  --color-gray-7: #111112;
+  --color-gray-10: #1A1A1A;
+  --color-gray-12: #1F1F1F;
+  --color-gray-13: #222222;
+  --color-gray-20: #333333;
+  --color-gray-27: #444444;
+  --color-gray-33: #555555;
+  --color-gray-37: #5F5F5F;
+  --color-gray-48: #7B7B7B;
+  --color-gray-56: #909090;
+  --color-gray-62: #A0A0A0;
+  --color-gray-75: #BFBFBF;
+  --color-gray-76: #C3C3C3;
+  --color-gray-78: #C8C8C8;
+  --color-gray-85: #D9D9D9;
+  --color-gray-87: #DDDDDD;
+  --color-gray-90: #E6E6E6;
+  --color-gray-92: #EEEEEE;
+  --color-gray-93: #ECECEC;
+  --color-gray-95: #F7F7F7;
+  --color-gray-96: #F5F5F5;
+  --color-gray-97: #F8F8F8;
+  --color-gray-98: #FAFAFA;
+  
+  --color-danger-45: #FF4343;
+  --color-danger-44: #FF3A3A;
+  --color-danger-88: #FFC6C6;
+
+  --color-pagination-text: #8C8C8C;
+  --color-pagination-active: #1890FF;
+}
