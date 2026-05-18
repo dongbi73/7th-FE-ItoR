@@ -29,7 +29,7 @@ export interface RegisterRequest {
   birthDate: string;
   name: string;
   introduction: string;
-  kakaoId?: number;
+  kakaoId?: number | string;
 }
 
 export interface RegisterData {
@@ -40,6 +40,15 @@ export interface RegisterData {
 }
 
 export interface KakaoRedirectData {
+  accessToken?: string;
+  refreshToken?: string;
+  kakaoId?: number | string;
+  id?: number | string;
+  oauthId?: number | string;
+  socialId?: number | string;
+  email?: string;
+  nickname?: string;
+  profilePicture?: string;
   httpStatus: string;
   responseMessage: string;
 }
@@ -67,10 +76,7 @@ export const reissueToken = async (): Promise<ReissueResponse> => {
   }
 };
 
-export const loginWithEmail = async (
-  email: string,
-  password: string,
-): Promise<LoginResponse> => {
+export const loginWithEmail = async (email: string, password: string): Promise<LoginResponse> => {
   return apiFetch<LoginResponse>('/auth/login', {
     method: 'POST',
     body: { email, password },

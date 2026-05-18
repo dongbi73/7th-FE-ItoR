@@ -116,6 +116,8 @@ Modal.Footer = ({
   secondaryText, 
   onSecondaryClick,
   primaryClassName, 
+  primaryDisabled = false,
+  secondaryDisabled = false,
 }: ModalFooterProps) => (
   <div className={styles.modalFooterBase}>
     {secondaryText && (
@@ -123,6 +125,7 @@ Modal.Footer = ({
         variant="primaryOutline" 
         className="flex-1 w-full px-3 py-2 rounded-xs border-gray-96 text-black " 
         onClick={onSecondaryClick}
+        disabled={secondaryDisabled}
       >
         {secondaryText}
       </Button>
@@ -133,6 +136,7 @@ Modal.Footer = ({
       className={cn('flex-1 w-full px-3 py-2 rounded-xs bg-btn-primary text-white',
       primaryClassName,)}  
       onClick={onPrimaryClick}
+      disabled={primaryDisabled}
     >
       {primaryText}
     </Button>

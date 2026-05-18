@@ -10,11 +10,11 @@ import { PostMeta } from '@/components/common/PostMeta';
 import { CommentInput } from '@/components/comment/CommentInput';
 import { CommentItem } from '@/components/comment/CommentItem';
 import { getFormattedDate } from '@/utils/date';
+import { sortByContentOrder } from '@/utils/postContent';
 import { useAuthStore } from '@/store/useAuthStore';
-import { deletePost, type PostDetail } from '@/api/post';
+import { deletePost } from '@/api/post';
 import { useToast } from '@/hooks/useToast';
 import {
-  createLocalComment,
   postKeys,
   useCreateCommentMutation,
   useDeleteCommentMutation,
@@ -30,13 +30,13 @@ const PostDetailPage = () => {
   const queryClient = useQueryClient();
   const [isPostMenuOpen, setIsPostMenuOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeletingPost, setIsDeletingPost] = useState(false);
   const commentRef = useRef<HTMLElement>(null);
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
   const { showToast } = useToast();
   const authUser = useAuthStore((state) => state.user);
   const isLoggedIn =
     useAuthStore((state) => state.isLoggedIn) || !!localStorage.getItem('accessToken');
-  const detailQueryKey = postId ? postKeys.detail(postId, isLoggedIn) : undefined;
   const { data: post, isLoading, isError } = usePostDetailQuery({ postId, isLoggedIn });
   const createCommentMutation = useCreateCommentMutation(postId, isLoggedIn);
   const deleteCommentMutation = useDeleteCommentMutation(postId, isLoggedIn);
@@ -74,9 +74,10 @@ const PostDetailPage = () => {
   };
 
   const handleDeletePost = async () => {
-    if (!postId) return;
+    if (!postId || isDeletingPost) return;
 
     try {
+      setIsDeletingPost(true);
       const response = await deletePost(postId);
 
       if (response.code !== 0) {
@@ -87,6 +88,10 @@ const PostDetailPage = () => {
       await queryClient.invalidateQueries({ queryKey: postKeys.all });
     } catch (error) {
       console.error('게시글 삭제 실패:', error);
+      showToast({ type: 'error', message: '삭제에 실패했습니다.' });
+      return;
+    } finally {
+      setIsDeletingPost(false);
     }
 
     sessionStorage.removeItem(`post-preview:${postId}`);
@@ -102,17 +107,7 @@ const PostDetailPage = () => {
       await createCommentMutation.mutateAsync(content);
     } catch (error) {
       console.error('댓글 등록 실패:', error);
-
-      if (import.meta.env.DEV && detailQueryKey) {
-        queryClient.setQueryData<PostDetail>(detailQueryKey, (current) =>
-          current
-            ? {
-                ...current,
-                comments: [...current.comments, createLocalComment({ content, authUser })],
-              }
-            : current,
-        );
-      }
+      showToast({ type: 'error', message: '댓글 등록에 실패했습니다.' });
     }
   };
 
@@ -121,6 +116,7 @@ const PostDetailPage = () => {
       await deleteCommentMutation.mutateAsync(commentId);
     } catch (error) {
       console.error('댓글 삭제 실패:', error);
+      showToast({ type: 'error', message: '댓글 삭제에 실패했습니다.' });
     }
   };
 
@@ -130,20 +126,7 @@ const PostDetailPage = () => {
       showToast({ type: 'success', message: '댓글이 수정되었습니다.' });
     } catch (error) {
       console.error('댓글 수정 실패:', error);
-
-      if (import.meta.env.DEV && detailQueryKey) {
-        queryClient.setQueryData<PostDetail>(detailQueryKey, (current) =>
-          current
-            ? {
-                ...current,
-                comments: current.comments.map((comment) =>
-                  comment.commentId === commentId ? { ...comment, content } : comment,
-                ),
-              }
-            : current,
-        );
-        showToast({ type: 'success', message: '댓글이 수정되었습니다.' });
-      }
+      showToast({ type: 'error', message: '댓글 수정에 실패했습니다.' });
     }
   };
 
@@ -174,6 +157,7 @@ const PostDetailPage = () => {
   const commentWriterProfileUrl = authUser?.profilePicture ?? '';
   const authorFallback = post.nickName[0]?.toUpperCase() ?? 'G';
   const canManagePost = isLoggedIn && post.isOwner;
+  const orderedContents = sortByContentOrder(post.contents);
 
   return (
     <>
@@ -217,7 +201,7 @@ const PostDetailPage = () => {
         <Blank size="md" />
 
         <section>
-          {post.contents.map((content) => {
+          {orderedContents.map((content) => {
             const wrapperClass = 'py-[12px] px-[16px] w-full';
 
             if (content.contentType === 'TEXT') {
@@ -235,7 +219,9 @@ const PostDetailPage = () => {
                 <div key={content.contentOrder} className={wrapperClass}>
                   <img
                     src={content.content}
-                    alt="post content"
+                    alt={`${post.title} 본문 이미지 ${content.contentOrder}`}
+                    width="688"
+                    height="387"
                     loading="lazy"
                     decoding="async"
                     className="h-auto w-full rounded-lg"
@@ -263,6 +249,8 @@ const PostDetailPage = () => {
                   key={comment.commentId}
                   comment={comment}
                   isLoggedIn={isLoggedIn}
+                  isDeleting={deleteCommentMutation.isPending}
+                  isUpdating={updateCommentMutation.isPending}
                   onDelete={handleDeleteComment}
                   onUpdate={handleUpdateComment}
                 />
@@ -283,6 +271,7 @@ const PostDetailPage = () => {
               nickName={commentWriterNickName}
               profileUrl={commentWriterProfileUrl}
               textareaRef={commentInputRef}
+              isSubmitting={createCommentMutation.isPending}
               onSubmit={handleCreateComment}
             />
           </div>
@@ -327,6 +316,8 @@ const PostDetailPage = () => {
           primaryText="삭제하기"
           onPrimaryClick={handleDeletePost}
           primaryClassName="bg-negative border border-negative"
+          primaryDisabled={isDeletingPost}
+          secondaryDisabled={isDeletingPost}
         />
       </Modal>
     </>

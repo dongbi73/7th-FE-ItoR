@@ -10,7 +10,7 @@ import { UserProfileForm } from '@/components/user/UserProfileForm';
 import { useUserForm, type UserFormValues } from '@/hooks/useUserForm';
 import { AddPhotoIcon } from '@/assets/icons';
 import { Button } from '@/components/common/Button';
-import { uploadImage } from '@/api/image';
+import { useImageUpload } from '@/hooks/useImageUpload';
 import {
   useMeQuery,
   useUpdateMyInfoMutation,
@@ -41,8 +41,15 @@ const ProfileSettingPage = () => {
   const { data: myInfo, isError } = useMeQuery();
   const updateMyInfoMutation = useUpdateMyInfoMutation();
   const updatePasswordMutation = useUpdatePasswordMutation();
+  const { uploadImageFile } = useImageUpload({
+    uploadErrorMessage: '프로필 이미지 업로드에 실패했습니다.',
+    onSuccess: (imageUrl) => {
+      setFieldValue('profilePicture', imageUrl);
+      showToast({ type: 'success', message: '프로필 사진이 업로드되었습니다.' });
+    },
+  });
 
-  const isKakao = false; // 나중에 user.loginType === 'KAKAO'로 교체
+  const isKakao = localStorage.getItem('authProvider') === 'KAKAO';
 
   useEffect(() => {
     if (!myInfo) return;
@@ -91,25 +98,7 @@ const ProfileSettingPage = () => {
   };
 
   const handleProfileFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      showToast({ type: 'error', message: '이미지 파일만 업로드 가능합니다.' });
-      event.target.value = '';
-      return;
-    }
-
-    try {
-      const imageUrl = await uploadImage(file);
-      setFieldValue('profilePicture', imageUrl);
-      showToast({ type: 'success', message: '프로필 사진이 업로드되었습니다.' });
-    } catch (error) {
-      console.error('프로필 이미지 업로드 실패:', error);
-      showToast({ type: 'error', message: '프로필 이미지 업로드에 실패했습니다.' });
-    }
-
+    await uploadImageFile(event.target.files?.[0]);
     event.target.value = '';
   };
 
@@ -119,6 +108,7 @@ const ProfileSettingPage = () => {
         type={editMode ? 'profileEdit' : 'profileView'}
         onDelete={handleCancel}
         onPublish={editMode ? handleSave : () => setEditMode(true)}
+        isPublishDisabled={updateMyInfoMutation.isPending || updatePasswordMutation.isPending}
       />
 
       <section className="bg-gray-96">

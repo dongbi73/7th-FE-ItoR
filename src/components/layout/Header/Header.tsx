@@ -15,6 +15,7 @@ interface HeaderProps {
   onPublish?: () => void;
   onDelete?: () => void;
   preview?: boolean;
+  isPublishDisabled?: boolean;
   onCommentClick?: () => void;
   showMoreButton?: boolean;
   isMoreMenuOpen?: boolean;
@@ -28,6 +29,7 @@ export const Header = ({
   onPublish,
   onDelete,
   preview = false,
+  isPublishDisabled = false,
   onCommentClick,
   showMoreButton = false,
   isMoreMenuOpen = false,
@@ -122,13 +124,19 @@ export const Header = ({
               {showMoreButton && (
                 <div className="relative">
                   <IconButton
+                    id="post-more-menu-button"
                     icon={<MoreVertIcon />}
                     size="frame"
                     aria-label="더보기"
+                    aria-haspopup="menu"
+                    aria-expanded={isMoreMenuOpen}
+                    aria-controls="post-more-menu"
                     onClick={onMoreClick}
                   />
                   {moreMenu && (
                     <Dropdown
+                      id="post-more-menu"
+                      ariaLabelledBy="post-more-menu-button"
                       isOpen={isMoreMenuOpen}
                       onClose={onMoreMenuClose ?? (() => {})}
                       position="bottom"
@@ -156,20 +164,22 @@ export const Header = ({
             <button
               type="button"
               onClick={onPublish}
+              disabled={isPublishDisabled}
               className="px-3 py-2 text-[14px] font-medium text-black"
             >
-              게시하기
+              {isPublishDisabled ? '게시 중' : '게시하기'}
             </button>
           </div>
         )}
 
         {type === 'profileView' && (
-          <button
-            type="button"
-            onClick={onPublish}
-            className="px-3 py-2 text-[14px] font-medium text-black"
-          >
-            수정하기
+            <button
+              type="button"
+              onClick={onPublish}
+              disabled={isPublishDisabled}
+              className="px-3 py-2 text-[14px] font-medium text-black"
+            >
+              수정하기
           </button>
         )}
 
@@ -185,9 +195,10 @@ export const Header = ({
             <button
               type="button"
               onClick={onPublish}
+              disabled={isPublishDisabled}
               className="w-19 px-3 py-2 text-[14px] font-medium text-black"
             >
-              저장하기
+              {isPublishDisabled ? '저장 중' : '저장하기'}
             </button>
           </div>
         )}

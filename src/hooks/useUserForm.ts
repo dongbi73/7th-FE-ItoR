@@ -28,6 +28,21 @@ const DEFAULT_VALUES: UserFormValues = {
 
 const REQUIRED_MESSAGE = '*반드시 입력해야하는 필수 사항입니다';
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const KOREAN_NAME_REGEX = /^[가-힣]+$/;
+const BIRTH_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+const isValidBirthDate = (birthDate: string) => {
+  if (!BIRTH_DATE_REGEX.test(birthDate)) return false;
+
+  const [year, month, day] = birthDate.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+};
 
 interface UseUserFormOptions {
   mode: UserFormMode;
@@ -57,6 +72,10 @@ export const useUserForm = ({ mode, initialValues }: UseUserFormOptions) => {
     setErrors({});
   }, []);
 
+  const setFieldError = useCallback(<K extends keyof UserFormValues>(field: K, message: string) => {
+    setErrors((prev) => ({ ...prev, [field]: message }));
+  }, []);
+
   const validateForm = () => {
     const nextErrors: UserFormErrors = {};
 
@@ -78,12 +97,16 @@ export const useUserForm = ({ mode, initialValues }: UseUserFormOptions) => {
 
     if (!values.name.trim()) {
       nextErrors.name = REQUIRED_MESSAGE;
+    } else if (!KOREAN_NAME_REGEX.test(values.name)) {
+      nextErrors.name = '*이름은 한글만 입력해주세요';
     } else if (values.name.length > 10) {
       nextErrors.name = '*이름은 최대 10글자 입니다';
     }
 
     if (!values.birthDate.trim()) {
       nextErrors.birthDate = REQUIRED_MESSAGE;
+    } else if (!isValidBirthDate(values.birthDate)) {
+      nextErrors.birthDate = '*생년월일은 YYYY-MM-DD 형식으로 입력해주세요';
     }
 
     if (!values.nickname.trim()) {
@@ -106,6 +129,7 @@ export const useUserForm = ({ mode, initialValues }: UseUserFormOptions) => {
     values,
     errors,
     setFieldValue,
+    setFieldError,
     resetForm,
     validateForm,
   };

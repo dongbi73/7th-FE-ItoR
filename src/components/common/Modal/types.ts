@@ -19,5 +19,7 @@ export interface ModalFooterProps {
   secondaryText?: string;           
   onSecondaryClick?: () => void;    
   primaryClassName?: string;
+  primaryDisabled?: boolean;
+  secondaryDisabled?: boolean;
 
 }

@@ -4,6 +4,9 @@ export interface DropdownProps {
   isOpen: boolean;          
   onClose: () => void;      
   children: ReactNode;      
+  id?: string;
+  ariaLabel?: string;
+  ariaLabelledBy?: string;
   className?: string;       
   hasCaret?: boolean;       
   isIconOnly?: boolean;

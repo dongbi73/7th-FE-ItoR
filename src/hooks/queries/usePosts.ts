@@ -15,8 +15,6 @@ import {
   deleteComment as deleteCommentApi,
   updateComment as updateCommentApi,
 } from '@/api/comment';
-import { DUMMY_POSTS } from '@/mocks/feed';
-import { DUMMY_POST_DETAIL } from '@/mocks/postdetail';
 
 export const postKeys = {
   all: ['posts'] as const,
@@ -25,8 +23,6 @@ export const postKeys = {
   detail: (postId: string, isLoggedIn: boolean) =>
     [...postKeys.all, 'detail', postId, { isLoggedIn }] as const,
 };
-
-const isDev = import.meta.env.DEV;
 
 export const usePostListQuery = ({
   currentPage,
@@ -40,24 +36,15 @@ export const usePostListQuery = ({
   return useQuery({
     queryKey: postKeys.list(currentPage, itemsPerPage, isLoggedIn),
     queryFn: async () => {
-      try {
-        const response = isLoggedIn
-          ? await getPostListWithToken(itemsPerPage, currentPage)
-          : await getPostList(itemsPerPage, currentPage);
+      const response = isLoggedIn
+        ? await getPostListWithToken(itemsPerPage, currentPage)
+        : await getPostList(itemsPerPage, currentPage);
 
-        if (response.code !== 0) {
-          throw new Error(response.message);
-        }
-
-        return response.data;
-      } catch (error) {
-        if (!isDev) throw error;
-
-        return {
-          posts: DUMMY_POSTS,
-          pageMax: Math.ceil(DUMMY_POSTS.length / itemsPerPage),
-        };
+      if (response.code !== 0) {
+        throw new Error(response.message);
       }
+
+      return response.data;
     },
   });
 };
@@ -83,18 +70,13 @@ export const usePostDetailQuery = ({
         return JSON.parse(previewPost) as PostDetail;
       }
 
-      try {
-        const response = isLoggedIn ? await getPostWithToken(postId) : await getPost(postId);
+      const response = isLoggedIn ? await getPostWithToken(postId) : await getPost(postId);
 
-        if (response.code !== 0) {
-          throw new Error(response.message);
-        }
-
-        return response.data;
-      } catch (error) {
-        if (!isDev) throw error;
-        return { ...DUMMY_POST_DETAIL, postId };
+      if (response.code !== 0) {
+        throw new Error(response.message);
       }
+
+      return response.data;
     },
   });
 };

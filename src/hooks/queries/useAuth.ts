@@ -20,6 +20,7 @@ export const useEmailLoginMutation = () => {
 
       localStorage.setItem('accessToken', response.data.accessToken);
       localStorage.setItem('refreshToken', response.data.refreshToken);
+      localStorage.setItem('authProvider', 'EMAIL');
 
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: userKeys.me }),
@@ -37,15 +38,14 @@ export const useKakaoLoginMutation = () => {
     onSuccess: async (response) => {
       if (response.code !== 0 || !('accessToken' in response.data)) return;
 
-      const data = response.data as { accessToken?: string; refreshToken?: string };
-
-      if (data.accessToken) {
-        localStorage.setItem('accessToken', data.accessToken);
+      if (response.data.accessToken) {
+        localStorage.setItem('accessToken', response.data.accessToken);
       }
 
-      if (data.refreshToken) {
-        localStorage.setItem('refreshToken', data.refreshToken);
+      if (response.data.refreshToken) {
+        localStorage.setItem('refreshToken', response.data.refreshToken);
       }
+      localStorage.setItem('authProvider', 'KAKAO');
 
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: userKeys.me }),

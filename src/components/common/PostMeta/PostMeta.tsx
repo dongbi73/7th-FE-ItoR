@@ -12,6 +12,9 @@ interface PostMetaProps {
   commentCount?: number;
   className?: string;
   showMoreButton?: boolean;
+  isMoreMenuOpen?: boolean;
+  moreMenuId?: string;
+  moreButtonId?: string;
   onMoreClick?: () => void;
 }
 
@@ -23,6 +26,9 @@ export const PostMeta = ({
   commentCount,
   className,
   showMoreButton = false,
+  isMoreMenuOpen = false,
+  moreMenuId,
+  moreButtonId,
   onMoreClick,
 }: PostMetaProps) => {
   if (variant === 'simple') {
@@ -52,6 +58,10 @@ export const PostMeta = ({
             size="frame"
             className="text-gray-20"
             aria-label="댓글 메뉴"
+            aria-haspopup="menu"
+            aria-expanded={isMoreMenuOpen}
+            aria-controls={moreMenuId}
+            id={moreButtonId}
             onClick={onMoreClick}
           />
         )}

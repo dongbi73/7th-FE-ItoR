@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { PostCard } from '@/components/common/PostCard';
 import { Pagination } from '@/components/common/Pagination';
 import { Blank } from '@/components/common/Blank';
@@ -9,7 +8,6 @@ import { useAuthStore } from '@/store/useAuthStore';
 const ITEMS_PER_PAGE = 10;
 
 const FeedPage = () => {
-  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const isLoggedIn =
     useAuthStore((state) => state.isLoggedIn) || !!localStorage.getItem('accessToken');
@@ -36,7 +34,7 @@ const FeedPage = () => {
         </div>
       ) : posts.length > 0 ? (
         posts.map((post) => (
-          <PostCard key={post.postId} post={post} onClick={() => navigate(`/post/${post.postId}`)} />
+          <PostCard key={post.postId} post={post} to={`/post/${post.postId}`} />
         ))
       ) : (
         <div className="px-4 py-12 text-center text-[14px] text-gray-56">

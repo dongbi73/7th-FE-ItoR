@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
 import { KakaoLogoIcon, AddPhotoIcon } from '@/assets/icons';
@@ -6,24 +6,114 @@ import { Avatar } from '@/components/common/Avatar';
 import { Header } from '@/components/layout/Header';
 import { Blank } from '@/components/common/Blank';
 import { Modal } from '@/components/common/Modal';
-import type { RegisterRequest } from '@/api/auth';
+import { getKakaoLoginUrl, type RegisterRequest } from '@/api/auth';
 import { UserProfileForm } from '@/components/user/UserProfileForm';
 import { useUserForm } from '@/hooks/useUserForm';
-import { uploadImage } from '@/api/image';
 import { useToast } from '@/hooks/useToast';
 import { useRegisterMutation } from '@/hooks/queries/useAuth';
+import { useImageUpload } from '@/hooks/useImageUpload';
 
 type Step = 'select' | 'form' | 'kakaoForm';
+
+interface KakaoRegisterDraft {
+  kakaoId?: number | string;
+  id?: number | string;
+  oauthId?: number | string;
+  socialId?: number | string;
+  email?: string;
+  nickname?: string;
+  profilePicture?: string;
+}
+
+const KAKAO_REGISTER_DRAFT_KEY = 'kakao-register-draft';
+
+const getDuplicateField = (message: string) => {
+  const lowerMessage = message.toLowerCase();
+
+  if (lowerMessage.includes('email') || message.includes('이메일')) return 'email';
+  if (lowerMessage.includes('nickname') || message.includes('닉네임')) return 'nickname';
+
+  return null;
+};
+
+const getErrorMessage = (error: unknown) => {
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'response' in error &&
+    typeof error.response === 'object' &&
+    error.response !== null &&
+    'data' in error.response &&
+    typeof error.response.data === 'object' &&
+    error.response.data !== null &&
+    'message' in error.response.data &&
+    typeof error.response.data.message === 'string'
+  ) {
+    return error.response.data.message;
+  }
+
+  return error instanceof Error && error.message ? error.message : '서버 통신에 실패했습니다.';
+};
+
+const getKakaoId = (draft: KakaoRegisterDraft | null) => {
+  return draft?.kakaoId ?? draft?.id ?? draft?.oauthId ?? draft?.socialId;
+};
 
 const RegisterPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [step, setStep] = useState<Step>('select');
+  const [kakaoDraft, setKakaoDraft] = useState<KakaoRegisterDraft | null>(null);
   const profileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const formMode = step === 'form' ? 'emailSignup' : 'kakaoSignup';
-  const { values, errors, setFieldValue, validateForm } = useUserForm({ mode: formMode });
+  const { values, errors, setFieldValue, setFieldError, validateForm } = useUserForm({
+    mode: formMode,
+  });
   const { showToast } = useToast();
   const registerMutation = useRegisterMutation(step === 'form' ? 'email' : 'kakao');
+  const { uploadImageFile } = useImageUpload({
+    uploadErrorMessage: '프로필 이미지 업로드에 실패했습니다.',
+    onSuccess: (imageUrl) => setFieldValue('profilePicture', imageUrl),
+  });
+
+  useEffect(() => {
+    const draft = sessionStorage.getItem(KAKAO_REGISTER_DRAFT_KEY);
+
+    if (!draft) return;
+
+    try {
+      const parsedDraft = JSON.parse(draft) as KakaoRegisterDraft;
+      setKakaoDraft(parsedDraft);
+      setStep('kakaoForm');
+
+      if (parsedDraft.email) setFieldValue('email', parsedDraft.email);
+      if (parsedDraft.nickname) setFieldValue('nickname', parsedDraft.nickname);
+      if (parsedDraft.profilePicture) setFieldValue('profilePicture', parsedDraft.profilePicture);
+    } catch (error) {
+      console.error('카카오 회원가입 정보 파싱 실패:', error);
+      sessionStorage.removeItem(KAKAO_REGISTER_DRAFT_KEY);
+    }
+  }, [setFieldValue]);
+
+  const handleRegisterError = (message: string) => {
+    const duplicateField = getDuplicateField(message);
+
+    if (duplicateField) {
+      setFieldError(duplicateField, message);
+      return;
+    }
+
+    showToast({ type: 'error', message });
+  };
+
+  const handleKakaoSignupClick = () => {
+    if (getKakaoId(kakaoDraft)) {
+      setStep('kakaoForm');
+      return;
+    }
+
+    window.location.href = getKakaoLoginUrl();
+  };
 
   const handleSubmit = async (event?: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
@@ -51,22 +141,30 @@ const RegisterPage = () => {
             }
           : {
               ...baseRequestData,
-              kakaoId: 12345,
+              kakaoId: getKakaoId(kakaoDraft),
             };
+
+      if (step === 'kakaoForm' && !requestData.kakaoId) {
+        showToast({ type: 'error', message: '카카오 인증 후 회원가입을 진행해주세요.' });
+        return;
+      }
 
       try {
         const response = await registerMutation.mutateAsync(requestData);
 
         if (response.code === 0) {
+          if (step === 'kakaoForm') {
+            sessionStorage.removeItem(KAKAO_REGISTER_DRAFT_KEY);
+          }
           setIsModalOpen(true);
         } else {
-          showToast({ type: 'error', message: response.message || '회원가입에 실패했습니다.' });
+          handleRegisterError(response.message || '회원가입에 실패했습니다.');
         }
       } catch (error) {
-        const message = error instanceof Error ? error.message : '서버 통신에 실패했습니다.';
+        const message = getErrorMessage(error);
 
         console.error('회원가입 중 에러:', error);
-        showToast({ type: 'error', message });
+        handleRegisterError(message);
       }
     }
   };
@@ -77,24 +175,7 @@ const RegisterPage = () => {
   };
 
   const handleProfileFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      showToast({ type: 'error', message: '이미지 파일만 업로드 가능합니다.' });
-      event.target.value = '';
-      return;
-    }
-
-    try {
-      const imageUrl = await uploadImage(file);
-      setFieldValue('profilePicture', imageUrl);
-    } catch (error) {
-      console.error('프로필 이미지 업로드 실패:', error);
-      showToast({ type: 'error', message: '프로필 이미지 업로드에 실패했습니다.' });
-    }
-
+    await uploadImageFile(event.target.files?.[0]);
     event.target.value = '';
   };
 
@@ -116,7 +197,7 @@ const RegisterPage = () => {
           <Blank size="sm" />
         </div>
       </div>
-      <hr className="w-full border-0 border-t border-divider" />
+      <hr className="border-divider w-full border-0 border-t" />
 
       {step === 'select' ? (
         <div className="flex w-full flex-1 items-center justify-center">
@@ -156,8 +237,8 @@ const RegisterPage = () => {
                   variant="primaryOutline"
                   icon={<KakaoLogoIcon />}
                   iconClassName="w-[18px] h-[18px]"
-                  onClick={() => setStep('kakaoForm')}
-                  className="h-11.25 gap-3 rounded-md border-none bg-kakao text-[15px] font-semibold text-black"
+                  onClick={handleKakaoSignupClick}
+                  className="bg-kakao h-11.25 gap-3 rounded-md border-none text-[15px] font-semibold text-black"
                 >
                   카카오로 회원가입
                 </Button>

@@ -6,6 +6,12 @@ import { Button } from '@/components/common/Button';
 import { TextField } from '@/components/common/TextField';
 import { getKakaoLoginUrl } from '@/api/auth';
 import { useEmailLoginMutation } from '@/hooks/queries/useAuth';
+import { useToast } from '@/hooks/useToast';
+
+interface LoginFormValues {
+  email: string;
+  password: string;
+}
 
 interface AuthPopupProps {
   onClose?: () => void;
@@ -15,17 +21,18 @@ interface AuthPopupProps {
 export const AuthPopup = ({ onClose, onUnregistered }: AuthPopupProps) => {
   const navigate = useNavigate();
   const loginMutation = useEmailLoginMutation();
+  const { showToast } = useToast();
 
   const {
     register,
     handleSubmit,
     setError,
     formState: { errors },
-  } = useForm({
+  } = useForm<LoginFormValues>({
     mode: 'onTouched',
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: LoginFormValues) => {
     try {
       const response = await loginMutation.mutateAsync({
         email: data.email,
@@ -43,11 +50,14 @@ export const AuthPopup = ({ onClose, onUnregistered }: AuthPopupProps) => {
       } else if (response.code === 401 || response.message.includes('password')) {
         setError('password', { message: '*비밀번호가 일치하지 않습니다.' });
       } else {
-        alert(response.message || '로그인 중 알 수 없는 오류가 발생했습니다.');
+        showToast({
+          type: 'error',
+          message: response.message || '로그인 중 알 수 없는 오류가 발생했습니다.',
+        });
       }
     } catch (err) {
       console.error('로그인 통신 에러:', err);
-      alert('서버와의 통신이 원활하지 않습니다.');
+      showToast({ type: 'error', message: '서버와의 통신이 원활하지 않습니다.' });
     }
   };
 
@@ -57,6 +67,7 @@ export const AuthPopup = ({ onClose, onUnregistered }: AuthPopupProps) => {
       window.location.href = loginUrl;
     } catch (error) {
       console.error('카카오 로그인 이동 실패:', error);
+      showToast({ type: 'error', message: '카카오 로그인 페이지로 이동하지 못했습니다.' });
     }
   };
 

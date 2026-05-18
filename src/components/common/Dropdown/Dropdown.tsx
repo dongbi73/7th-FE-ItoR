@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { DropdownProps, DropdownItemProps } from './types';
 import { cn } from '@/utils/cn';
 import * as styles from './variants';
@@ -7,22 +7,56 @@ export const Dropdown = ({
   isOpen, 
   onClose, 
   children, 
+  id,
+  ariaLabel,
+  ariaLabelledBy,
   className, 
   hasCaret = true,
   isIconOnly = false, 
   position = 'bottom'
 }: DropdownProps & { isIconOnly?: boolean }) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!isOpen) return undefined;
 
-    const handleEscape = (event: KeyboardEvent) => {
+    const getMenuItems = () =>
+      Array.from(menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []);
+
+    window.setTimeout(() => getMenuItems()[0]?.focus(), 0);
+
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         onClose();
+        return;
+      }
+
+      const menuItems = getMenuItems();
+      const currentIndex = menuItems.findIndex((item) => item === document.activeElement);
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        menuItems[(currentIndex + 1) % menuItems.length]?.focus();
+      }
+
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        menuItems[(currentIndex - 1 + menuItems.length) % menuItems.length]?.focus();
+      }
+
+      if (event.key === 'Home') {
+        event.preventDefault();
+        menuItems[0]?.focus();
+      }
+
+      if (event.key === 'End') {
+        event.preventDefault();
+        menuItems[menuItems.length - 1]?.focus();
       }
     };
 
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -34,7 +68,11 @@ export const Dropdown = ({
       <div aria-hidden="true" className="fixed inset-0 z-90" onClick={onClose} />
       
       <div
+        ref={menuRef}
+        id={id}
         role="menu"
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
         className={cn(
           styles.dropdownContainer, 
           styles.positionVariants[position],
