@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthModal } from '@/context/AuthModalContext';
 import { useKakaoLoginMutation } from '@/hooks/queries/useAuth';
@@ -33,14 +33,14 @@ export const KakaoCallback = () => {
   const kakaoLoginMutation = useKakaoLoginMutation();
   const { mutateAsync: loginWithKakao } = kakaoLoginMutation;
 
-  const openKakaoRegister = (responseData: unknown) => {
+  const openKakaoRegister = useCallback((responseData: unknown) => {
     sessionStorage.setItem(
       'kakao-register-draft',
       JSON.stringify(getKakaoRegisterDraft(responseData)),
     );
     navigate('/', { replace: true });
     openUnregistered();
-  };
+  }, [navigate, openUnregistered]);
 
   useEffect(() => {
     const code = searchParams.get('code');
@@ -103,7 +103,7 @@ export const KakaoCallback = () => {
     return () => {
       isSubscribed = false;
     };
-  }, [searchParams, navigate, openUnregistered, loginWithKakao]);
+  }, [searchParams, navigate, loginWithKakao, openKakaoRegister]);
 
   return null;
 };

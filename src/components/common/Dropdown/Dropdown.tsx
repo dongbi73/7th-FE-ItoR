@@ -3,6 +3,16 @@ import type { DropdownProps, DropdownItemProps } from './types';
 import { cn } from '@/utils/cn';
 import * as styles from './variants';
 
+type DropdownChildProps = {
+  isIconOnly?: boolean;
+};
+
+type DropdownAsChildProps = {
+  role?: string;
+  className?: string;
+  onClick?: DropdownItemProps['onClick'];
+};
+
 export const Dropdown = ({ 
   isOpen, 
   onClose, 
@@ -83,7 +93,9 @@ export const Dropdown = ({
       >
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
-            return React.cloneElement(child as React.ReactElement<any>, { isIconOnly });
+            return React.cloneElement(child as React.ReactElement<DropdownChildProps>, {
+              isIconOnly,
+            });
           }
           return child;
         })}
@@ -102,9 +114,11 @@ Dropdown.Item = ({
 }: DropdownItemProps & { isIconOnly?: boolean }) => {
   
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children as React.ReactElement<any>, {
+    const child = children as React.ReactElement<DropdownAsChildProps>;
+
+    return React.cloneElement(child, {
       role: 'menuitem',
-      className: cn((children.props as { className?: string }).className, className),
+      className: cn(child.props.className, className),
       onClick,
     });
   }
