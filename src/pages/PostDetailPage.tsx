@@ -1,141 +1,54 @@
-import { useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
 import { Header } from '@/components/layout/Header';
 import { Avatar } from '@/components/common/Avatar';
 import { Blank } from '@/components/common/Blank';
 import { Dropdown } from '@/components/common/Dropdown';
 import { Modal } from '@/components/common/Modal';
 import { PostMeta } from '@/components/common/PostMeta';
+import { StatusMessage } from '@/components/common/StatusMessage';
 import { CommentInput } from '@/components/comment/CommentInput';
 import { CommentItem } from '@/components/comment/CommentItem';
-import { getFormattedDate } from '@/utils/date';
-import { sortByContentOrder } from '@/utils/postContent';
-import { useAuthStore } from '@/store/useAuthStore';
-import { deletePost } from '@/api/post';
-import { useToast } from '@/hooks/useToast';
-import {
-  postKeys,
-  useCreateCommentMutation,
-  useDeleteCommentMutation,
-  usePostDetailQuery,
-  useUpdateCommentMutation,
-} from '@/hooks/queries/usePosts';
-
-const HEADER_OFFSET = 72;
+import { usePostDetailPage } from '@/hooks/usePostDetailPage';
 
 const PostDetailPage = () => {
-  const { postId } = useParams();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const [isPostMenuOpen, setIsPostMenuOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isDeletingPost, setIsDeletingPost] = useState(false);
-  const commentRef = useRef<HTMLElement>(null);
-  const commentInputRef = useRef<HTMLTextAreaElement>(null);
-  const { showToast } = useToast();
-  const authUser = useAuthStore((state) => state.user);
-  const isLoggedIn =
-    useAuthStore((state) => state.isLoggedIn) || !!localStorage.getItem('accessToken');
-  const { data: post, isLoading, isError } = usePostDetailQuery({ postId, isLoggedIn });
-  const createCommentMutation = useCreateCommentMutation(postId, isLoggedIn);
-  const deleteCommentMutation = useDeleteCommentMutation(postId, isLoggedIn);
-  const updateCommentMutation = useUpdateCommentMutation(postId, isLoggedIn);
-
-  const scrollToComment = () => {
-    if (!commentRef.current) return;
-
-    const top =
-      commentRef.current.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET + 10;
-    window.scrollTo({ top, behavior: 'smooth' });
-  };
-
-  const handleCommentIconClick = () => {
-    if (!isLoggedIn) {
-      navigate('/login');
-      return;
-    }
-
-    scrollToComment();
-    window.setTimeout(() => commentInputRef.current?.focus(), 350);
-  };
-
-  const handleEditPost = () => {
-    if (!postId || !post) return;
-
-    sessionStorage.setItem(`post-preview:${postId}`, JSON.stringify(post));
-    setIsPostMenuOpen(false);
-    navigate(`/write/${postId}`);
-  };
-
-  const handleDeletePostClick = () => {
-    setIsPostMenuOpen(false);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleDeletePost = async () => {
-    if (!postId || isDeletingPost) return;
-
-    try {
-      setIsDeletingPost(true);
-      const response = await deletePost(postId);
-
-      if (response.code !== 0) {
-        showToast({ type: 'error', message: '삭제에 실패했습니다.' });
-        return;
-      }
-
-      await queryClient.invalidateQueries({ queryKey: postKeys.all });
-    } catch (error) {
-      console.error('게시글 삭제 실패:', error);
-      showToast({ type: 'error', message: '삭제에 실패했습니다.' });
-      return;
-    } finally {
-      setIsDeletingPost(false);
-    }
-
-    sessionStorage.removeItem(`post-preview:${postId}`);
-    setIsDeleteModalOpen(false);
-    showToast({ type: 'success', message: '삭제되었습니다!' });
-    navigate('/');
-  };
-
-  const handleCreateComment = async (content: string) => {
-    if (!postId) return;
-
-    try {
-      await createCommentMutation.mutateAsync(content);
-    } catch (error) {
-      console.error('댓글 등록 실패:', error);
-      showToast({ type: 'error', message: '댓글 등록에 실패했습니다.' });
-    }
-  };
-
-  const handleDeleteComment = async (commentId: number) => {
-    try {
-      await deleteCommentMutation.mutateAsync(commentId);
-    } catch (error) {
-      console.error('댓글 삭제 실패:', error);
-      showToast({ type: 'error', message: '댓글 삭제에 실패했습니다.' });
-    }
-  };
-
-  const handleUpdateComment = async (commentId: number, content: string) => {
-    try {
-      await updateCommentMutation.mutateAsync({ commentId, content });
-      showToast({ type: 'success', message: '댓글이 수정되었습니다.' });
-    } catch (error) {
-      console.error('댓글 수정 실패:', error);
-      showToast({ type: 'error', message: '댓글 수정에 실패했습니다.' });
-    }
-  };
+  const {
+    state: {
+      post,
+      isLoading,
+      isError,
+      isLoggedIn,
+      isPostMenuOpen,
+      isDeleteModalOpen,
+      isDeletingPost,
+      formattedDate,
+      commentWriterNickName,
+      commentWriterProfileUrl,
+      authorFallback,
+      canManagePost,
+      orderedContents,
+      isCreatingComment,
+      isDeletingComment,
+      isUpdatingComment,
+    },
+    refs: { commentRef, commentInputRef },
+    actions: {
+      setIsPostMenuOpen,
+      setIsDeleteModalOpen,
+      handleCommentIconClick,
+      handleEditPost,
+      handleDeletePostClick,
+      handleDeletePost,
+      handleCreateComment,
+      handleDeleteComment,
+      handleUpdateComment,
+    },
+  } = usePostDetailPage();
 
   if (isLoading) {
     return (
       <>
         <Header type="detail" onCommentClick={handleCommentIconClick} />
-        <main className="mx-auto max-w-172 px-4 py-16 text-center text-[14px] text-gray-56">
-          게시글을 불러오고 있습니다.
+        <main className="mx-auto max-w-172">
+          <StatusMessage className="py-16">게시글을 불러오고 있습니다.</StatusMessage>
         </main>
       </>
     );
@@ -145,19 +58,12 @@ const PostDetailPage = () => {
     return (
       <>
         <Header type="detail" onCommentClick={handleCommentIconClick} />
-        <main className="mx-auto max-w-172 px-4 py-16 text-center text-[14px] text-gray-56">
-          게시글을 불러오지 못했습니다.
+        <main className="mx-auto max-w-172">
+          <StatusMessage className="py-16">게시글을 불러오지 못했습니다.</StatusMessage>
         </main>
       </>
     );
   }
-
-  const formattedDate = getFormattedDate(post.createdAt);
-  const commentWriterNickName = authUser?.nickname ?? '나';
-  const commentWriterProfileUrl = authUser?.profilePicture ?? '';
-  const authorFallback = post.nickName[0]?.toUpperCase() ?? 'G';
-  const canManagePost = isLoggedIn && post.isOwner;
-  const orderedContents = sortByContentOrder(post.contents);
 
   return (
     <>
@@ -229,6 +135,7 @@ const PostDetailPage = () => {
                 </div>
               );
             }
+
             return null;
           })}
         </section>
@@ -249,8 +156,8 @@ const PostDetailPage = () => {
                   key={comment.commentId}
                   comment={comment}
                   isLoggedIn={isLoggedIn}
-                  isDeleting={deleteCommentMutation.isPending}
-                  isUpdating={updateCommentMutation.isPending}
+                  isDeleting={isDeletingComment}
+                  isUpdating={isUpdatingComment}
                   onDelete={handleDeleteComment}
                   onUpdate={handleUpdateComment}
                 />
@@ -271,7 +178,7 @@ const PostDetailPage = () => {
               nickName={commentWriterNickName}
               profileUrl={commentWriterProfileUrl}
               textareaRef={commentInputRef}
-              isSubmitting={createCommentMutation.isPending}
+              isSubmitting={isCreatingComment}
               onSubmit={handleCreateComment}
             />
           </div>
@@ -307,7 +214,7 @@ const PostDetailPage = () => {
             <span id="post-delete-title">해당 블로그를 삭제하시겠어요?</span>
           </Modal.Title>
           <Modal.Description>
-            <span id="post-delete-description">삭제된 블로그는 다시 확인할 수 없어요</span>
+            <span id="post-delete-description">삭제한 블로그는 다시 확인할 수 없어요.</span>
           </Modal.Description>
         </Modal.Header>
         <Modal.Footer

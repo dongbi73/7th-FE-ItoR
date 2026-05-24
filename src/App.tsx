@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
+import { ToastRenderer } from '@/components/common/Toast';
 import { router } from '@/router/Router';
 import { useAuthStore } from '@/store/useAuthStore';
 
@@ -14,7 +15,12 @@ function App() {
     };
   }, [logout]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <ToastRenderer />
+    </>
+  );
 }
 
 export default App;

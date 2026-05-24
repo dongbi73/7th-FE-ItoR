@@ -6,7 +6,6 @@ import {
   getPostWithToken,
   postBoard,
   updatePost,
-  type Comment,
   type PostDetail,
   type PostRequestBody,
 } from '@/api/post';
@@ -67,6 +66,7 @@ export const usePostDetailQuery = ({
       const previewPost = sessionStorage.getItem(`post-preview:${postId}`);
 
       if (previewPost) {
+        sessionStorage.removeItem(`post-preview:${postId}`);
         return JSON.parse(previewPost) as PostDetail;
       }
 
@@ -249,17 +249,3 @@ export const useUpdatePostMutation = (postId?: string, isLoggedIn = true) => {
   });
 };
 
-export const createLocalComment = ({
-  content,
-  authUser,
-}: {
-  content: string;
-  authUser?: { nickname?: string; profilePicture?: string } | null;
-}): Comment => ({
-  commentId: Date.now(),
-  content,
-  nickName: authUser?.nickname ?? '사용자',
-  profileUrl: authUser?.profilePicture ?? '',
-  createdAt: new Date().toISOString(),
-  isOwner: true,
-});

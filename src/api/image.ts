@@ -19,6 +19,11 @@ export const getPresignedUrl = async (fileName: string): Promise<PresignedUrlRes
 
 export const uploadImage = async (file: File): Promise<string> => {
   const response = await getPresignedUrl(file.name);
+
+  if (response.code !== 0) {
+    throw new Error(response.message);
+  }
+
   const presignedUrl = response.data;
 
   const uploadResponse = await fetch(presignedUrl, {

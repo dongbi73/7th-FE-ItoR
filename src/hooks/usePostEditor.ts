@@ -7,6 +7,7 @@ import {
   type PostDetail,
 } from '@/api/post';
 import { useToast } from '@/hooks/useToast';
+import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import {
   useCreatePostMutation,
@@ -38,7 +39,7 @@ export const usePostEditor = () => {
   const textAreaRefs = useRef(new Map<string, HTMLTextAreaElement>());
   const lastTextSelectionRef = useRef<TextSelection | null>(null);
 
-  const isLoggedIn = !!localStorage.getItem('accessToken');
+  const { isLoggedIn } = useAuthStatus();
   const isEditMode = !!postId;
   const createPostMutation = useCreatePostMutation();
   const updatePostMutation = useUpdatePostMutation(postId, isLoggedIn);

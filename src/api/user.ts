@@ -33,28 +33,10 @@ export const updateMyInfo = async (
   });
 };
 
-export const updateProfilePicture = async (
-  profilePicture: string,
-): Promise<BaseResponse<object>> => {
-  return apiFetch<BaseResponse<object>>('/users/picture', {
-    method: 'PATCH',
-    body: { profilePicture },
-    headers: getAuthHeader(),
-  });
-};
-
 export const updatePassword = async (password: string): Promise<BaseResponse<object>> => {
   return apiFetch<BaseResponse<object>>('/users/password', {
     method: 'PATCH',
     body: { password },
-    headers: getAuthHeader(),
-  });
-};
-
-export const updateNickname = async (nickname: string): Promise<BaseResponse<object>> => {
-  return apiFetch<BaseResponse<object>>('/users/nickname', {
-    method: 'PATCH',
-    body: { nickname },
     headers: getAuthHeader(),
   });
 };

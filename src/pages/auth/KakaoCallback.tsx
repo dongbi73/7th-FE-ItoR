@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuthModal } from '@/context/AuthModalContext';
+import { useAuthModal } from '@/hooks/useAuthModal';
 import { useKakaoLoginMutation } from '@/hooks/queries/useAuth';
 
 const getKakaoRegisterDraft = (responseData: unknown) => {

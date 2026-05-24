@@ -7,7 +7,8 @@ import { Dropdown } from '@/components/common/Dropdown';
 import { IconButton } from '@/components/common/IconButton';
 import { ProfileCard } from '@/components/common/ProfileCard';
 import { cn } from '@/utils/cn';
-import { useAuthModal } from '@/context/AuthModalContext';
+import { useAuthModal } from '@/hooks/useAuthModal';
+import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { useMeQuery } from '@/hooks/queries/useUserQueries';
 
 interface HeaderProps {
@@ -39,7 +40,7 @@ export const Header = ({
 }: HeaderProps) => {
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const isLoggedIn = !!localStorage.getItem('accessToken');
+  const { isLoggedIn } = useAuthStatus();
   const { openLogoutConfirm } = useAuthModal();
   const { data: userData } = useMeQuery({ enabled: isLoggedIn && isProfileOpen });
 

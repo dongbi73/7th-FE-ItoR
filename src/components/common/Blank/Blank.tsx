@@ -12,7 +12,5 @@ const sizeClasses = {
 } as const;
 
 export const Blank = ({ size = 'sm', className }: BlankProps) => {
-  return (
-    <div className={cn('w-full',sizeClasses[size], className)} />
-  );
+  return <div className={cn('w-full', sizeClasses[size], className)} />;
 };

@@ -1,17 +1,9 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AuthPopup } from '@/pages/auth/AuthPopup';
 import { Modal } from '@/components/common/Modal';
+import { AuthModalContext } from '@/context/AuthModalContextValue';
 import { useAuthStore } from '@/store/useAuthStore';
-
-interface AuthModalContextType {
-  openLogin: () => void;
-  closeLogin: () => void;
-  openUnregistered: () => void;
-  openLogoutConfirm: (onConfirm?: () => void) => void;
-}
-
-const AuthModalContext = createContext<AuthModalContextType | null>(null);
 
 export const AuthModalProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
@@ -65,7 +57,7 @@ export const AuthModalProvider = ({ children }: { children: React.ReactNode }) =
 
       <Modal isOpen={isUnregisteredOpen} onClose={() => setIsUnregisteredOpen(false)}>
         <Modal.Header>
-          <Modal.Title> 가입되지 않은 계정이에요. </Modal.Title>
+          <Modal.Title>가입되지 않은 계정이에요</Modal.Title>
           <Modal.Description>회원가입을 진행할까요?</Modal.Description>
         </Modal.Header>
 
@@ -84,7 +76,7 @@ export const AuthModalProvider = ({ children }: { children: React.ReactNode }) =
 
       <Modal isOpen={isLogoutOpen} onClose={closeLogoutConfirm}>
         <Modal.Header>
-          <Modal.Title>로그아웃을 진행할게요</Modal.Title>
+          <Modal.Title>로그아웃을 진행할까요?</Modal.Title>
         </Modal.Header>
 
         <Modal.Footer
@@ -101,10 +93,4 @@ export const AuthModalProvider = ({ children }: { children: React.ReactNode }) =
       </Modal>
     </AuthModalContext.Provider>
   );
-};
-
-export const useAuthModal = () => {
-  const context = useContext(AuthModalContext);
-  if (!context) throw new Error('useAuthModal must be used within AuthModalProvider');
-  return context;
 };

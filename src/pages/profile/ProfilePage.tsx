@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Avatar } from '@/components/common/Avatar';
 import { Button } from '@/components/common/Button';
 import { Blank } from '@/components/common/Blank';
@@ -8,7 +8,9 @@ import { useMeQuery } from '@/hooks/queries/useUserQueries';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const { profileUserId = 'me' } = useParams();
   const { data: user } = useMeQuery();
+  const isMyProfile = profileUserId === 'me' || String(user?.id) === profileUserId;
 
   return (
     <div>
@@ -29,14 +31,19 @@ const ProfilePage = () => {
             </p>
           </div>
           
-          <div className="px-4 py-3">
-            <Button  variant="grayOutline" icon={<SettingsIcon />} iconClassName="w-[14px] h-[14px]" 
-            className="px-2 pt-0.5 pb-1 text-[12px] border border-gray-90 rounded-none"
-            onClick={() => navigate('/profile/me/settings')}
-            >
-              내 프로필 설정
-            </Button>
-          </div>
+          {isMyProfile && (
+            <div className="px-4 py-3">
+              <Button
+                variant="grayOutline"
+                icon={<SettingsIcon />}
+                iconClassName="w-[14px] h-[14px]"
+                className="border-gray-90 rounded-none border px-2 pt-0.5 pb-1 text-[12px]"
+                onClick={() => navigate('/profile/me/settings')}
+              >
+                내 프로필 설정
+              </Button>
+            </div>
+          )}
           
           <Blank size ="sm"/>
 

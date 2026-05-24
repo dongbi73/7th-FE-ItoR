@@ -6,8 +6,21 @@ import {
   registerUser,
   type RegisterRequest,
 } from '@/api/auth';
+import { getMyInfo } from '@/api/user';
 import { postKeys } from '@/hooks/queries/usePosts';
 import { userKeys } from '@/hooks/queries/useUserQueries';
+import { useAuthStore } from '@/store/useAuthStore';
+
+const syncAuthUser = async (queryClient: ReturnType<typeof useQueryClient>) => {
+  const response = await getMyInfo();
+
+  if (response.code !== 0) {
+    throw new Error(response.message);
+  }
+
+  useAuthStore.getState().setUser(response.data);
+  queryClient.setQueryData(userKeys.me, response.data);
+};
 
 export const useEmailLoginMutation = () => {
   const queryClient = useQueryClient();
@@ -21,6 +34,8 @@ export const useEmailLoginMutation = () => {
       localStorage.setItem('accessToken', response.data.accessToken);
       localStorage.setItem('refreshToken', response.data.refreshToken);
       localStorage.setItem('authProvider', 'EMAIL');
+
+      await syncAuthUser(queryClient);
 
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: userKeys.me }),
@@ -46,6 +61,8 @@ export const useKakaoLoginMutation = () => {
         localStorage.setItem('refreshToken', response.data.refreshToken);
       }
       localStorage.setItem('authProvider', 'KAKAO');
+
+      await syncAuthUser(queryClient);
 
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: userKeys.me }),
