@@ -19,18 +19,18 @@ export const IconButton = ({
   isActive = false,
   size = 'frame',
   className,
-  type,
+  type = 'button',
   ...props
 }: IconButtonProps) => {
   return (
     <button
-      type={type ?? 'button'}
+      type={type}
       className={cn(
         'inline-flex items-center justify-center rounded-xs border border-transparent bg-transparent text-gray-27 transition-colors',
         'hover:bg-gray-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-btn-primary',
         isActive && 'bg-gray-90',
         sizeClasses[size],
-        className
+        className,
       )}
       {...props}
     >

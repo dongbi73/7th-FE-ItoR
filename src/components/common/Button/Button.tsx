@@ -16,14 +16,14 @@ export const Button = ({
   iconClassName,
   children,
   className,
+  type = 'button',
   ...props
 }: ButtonProps) => {
-
-  const iconSize = variant === 'ghost' ? 'w-3.5 h-3.5' : 'w-6 h-6'; 
+  const iconSize = variant === 'ghost' ? 'w-3.5 h-3.5' : 'w-6 h-6';
 
   return (
     <button
-      type={props.type ?? 'button'}
+      type={type}
       className={cn(styles.buttonBase, styles.buttonVariants[variant], className)}
       {...props}
     >
@@ -32,7 +32,7 @@ export const Button = ({
           {icon}
         </span>
       )}
-      
+
       {children && <span>{children}</span>}
     </button>
   );

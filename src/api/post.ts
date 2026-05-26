@@ -1,4 +1,12 @@
 import { apiFetch, getAuthHeader } from '@/api/http';
+import type { PostRequestBody } from '@/utils/postRequest';
+
+export { createPostRequestBody } from '@/utils/postRequest';
+export type {
+  EditorBlock,
+  PostRequestBody,
+  PostRequestContent,
+} from '@/utils/postRequest';
 
 export interface BaseResponse<T> {
   code: number;
@@ -21,34 +29,6 @@ export interface Post {
   commentCount: number;
   contents: PostContent[];
 }
-
-export interface PostRequestContent {
-  contentOrder: number;
-  content: string;
-  contentType: 'TEXT' | 'IMAGE';
-}
-
-export interface PostRequestBody {
-  title: string;
-  contents: PostRequestContent[];
-}
-
-export interface EditorBlock {
-  id: string;
-  type: 'TEXT' | 'IMAGE';
-  value: string;
-}
-
-export const createPostRequestBody = (title: string, blocks: EditorBlock[]): PostRequestBody => {
-  return {
-    title,
-    contents: blocks.map((block, index) => ({
-      contentOrder: index + 1,
-      content: block.value,
-      contentType: block.type,
-    })),
-  };
-};
 
 export interface PostListData {
   posts: Post[];

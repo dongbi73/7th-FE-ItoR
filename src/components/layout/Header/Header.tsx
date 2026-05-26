@@ -1,15 +1,14 @@
-import * as styles from './Header.styles';
 import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChatIcon, CreateIcon, MoreVertIcon, ReorderIcon } from '@/assets/icons';
-import { Button } from '@/components/common/Button';
-import { Dropdown } from '@/components/common/Dropdown';
+import { ReorderIcon } from '@/assets/icons';
 import { IconButton } from '@/components/common/IconButton';
 import { ProfileCard } from '@/components/common/ProfileCard';
-import { cn } from '@/utils/cn';
 import { useAuthModal } from '@/hooks/useAuthModal';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { useMeQuery } from '@/hooks/queries/useUserQueries';
+import { cn } from '@/utils/cn';
+import { HeaderActions } from './HeaderActions';
+import * as styles from './Header.styles';
 
 interface HeaderProps {
   type?: 'main' | 'plain' | 'detail' | 'edit' | 'profileView' | 'profileEdit';
@@ -101,108 +100,19 @@ export const Header = ({
       )}
 
       <div className="flex items-center gap-3">
-        {type === 'main' && (
-          <Button
-            variant="ghost"
-            icon={<CreateIcon className="h-full w-full" />}
-            iconClassName="w-6 h-6"
-            onClick={handleWriteClick}
-            className="h-auto gap-1 px-3 py-2 text-[14px]"
-          >
-            깃로그 쓰기
-          </Button>
-        )}
-
-        {type === 'detail' && (
-          <>
-            <div className="flex gap-2">
-              <IconButton
-                icon={<ChatIcon />}
-                size="frame"
-                aria-label="댓글 보기"
-                onClick={onCommentClick}
-              />
-              {showMoreButton && (
-                <div className="relative">
-                  <IconButton
-                    id="post-more-menu-button"
-                    icon={<MoreVertIcon />}
-                    size="frame"
-                    aria-label="더보기"
-                    aria-haspopup="menu"
-                    aria-expanded={isMoreMenuOpen}
-                    aria-controls="post-more-menu"
-                    onClick={onMoreClick}
-                  />
-                  {moreMenu && (
-                    <Dropdown
-                      id="post-more-menu"
-                      ariaLabelledBy="post-more-menu-button"
-                      isOpen={isMoreMenuOpen}
-                      onClose={onMoreMenuClose ?? (() => {})}
-                      position="bottom"
-                      className="right-0 left-auto translate-x-0"
-                      hasCaret
-                    >
-                      {moreMenu}
-                    </Dropdown>
-                  )}
-                </div>
-              )}
-            </div>
-          </>
-        )}
-
-        {type === 'edit' && (
-          <div className="flex items-center">
-            <button
-              type="button"
-              onClick={onDelete}
-              className="text-negative px-3 py-2 text-[14px] font-medium"
-            >
-              삭제하기
-            </button>
-            <button
-              type="button"
-              onClick={onPublish}
-              disabled={isPublishDisabled}
-              className="px-3 py-2 text-[14px] font-medium text-black"
-            >
-              {isPublishDisabled ? '게시 중' : '게시하기'}
-            </button>
-          </div>
-        )}
-
-        {type === 'profileView' && (
-            <button
-              type="button"
-              onClick={onPublish}
-              disabled={isPublishDisabled}
-              className="px-3 py-2 text-[14px] font-medium text-black"
-            >
-              수정하기
-          </button>
-        )}
-
-        {type === 'profileEdit' && (
-          <div className="flex items-center gap-6">
-            <button
-              type="button"
-              onClick={onDelete}
-              className="text-negative px-3 py-2 text-[14px] font-medium"
-            >
-              취소하기
-            </button>
-            <button
-              type="button"
-              onClick={onPublish}
-              disabled={isPublishDisabled}
-              className="w-19 px-3 py-2 text-[14px] font-medium text-black"
-            >
-              {isPublishDisabled ? '저장 중' : '저장하기'}
-            </button>
-          </div>
-        )}
+        <HeaderActions
+          type={type}
+          onWriteClick={handleWriteClick}
+          onPublish={onPublish}
+          onDelete={onDelete}
+          isPublishDisabled={isPublishDisabled}
+          onCommentClick={onCommentClick}
+          showMoreButton={showMoreButton}
+          isMoreMenuOpen={isMoreMenuOpen}
+          onMoreClick={onMoreClick}
+          onMoreMenuClose={onMoreMenuClose}
+          moreMenu={moreMenu}
+        />
       </div>
     </header>
   );

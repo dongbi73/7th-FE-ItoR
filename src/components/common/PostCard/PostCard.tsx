@@ -2,9 +2,9 @@ import { cn } from '@/utils/cn';
 import * as styles from './variants';
 import { PostMeta } from '@/components/common/PostMeta';
 import type { Post } from '@/api/post';
-import { getFormattedDate } from '@/utils/date'; 
+import { getFormattedDate } from '@/utils/date';
+import { sortByContentOrder } from '@/utils/postContent';
 import { Link } from 'react-router-dom';
-
 
 interface PostCardProps {
   post: Post;
@@ -13,8 +13,10 @@ interface PostCardProps {
 }
 
 export const PostCard = ({ post, className, to }: PostCardProps) => {
-  const textContent = post.contents.find(c => c.contentType === 'TEXT')?.content ?? '';
-  const imageContent = post.contents.find(c => c.contentType === 'IMAGE')?.content;
+  const orderedContents = sortByContentOrder(post.contents);
+  const textContent =
+    orderedContents.find((content) => content.contentType === 'TEXT')?.content ?? '';
+  const imageContent = orderedContents.find((content) => content.contentType === 'IMAGE')?.content;
   const formattedDate = getFormattedDate(post.createdAt);
   const content = (
     <>
@@ -24,24 +26,24 @@ export const PostCard = ({ post, className, to }: PostCardProps) => {
           <p className={styles.postCardPreview}>{textContent}</p>
         </div>
 
-          <PostMeta 
-            profileUrl={post.profileUrl}
-            nickName={post.nickName}
-            formattedDate={formattedDate}
-            commentCount={post.commentCount}
-          />
+        <PostMeta
+          profileUrl={post.profileUrl}
+          nickName={post.nickName}
+          formattedDate={formattedDate}
+          commentCount={post.commentCount}
+        />
       </div>
 
       {imageContent && (
         <div className={styles.postCardThumbnailContainer}>
-          <img 
-            src={imageContent} 
+          <img
+            src={imageContent}
             alt={`${post.title} 썸네일`}
             width="124"
             height="116"
             loading="lazy"
             decoding="async"
-            className={styles.postCardThumbnail} 
+            className={styles.postCardThumbnail}
           />
         </div>
       )}
