@@ -68,7 +68,7 @@ export const Header = ({
           onClick={handleMenuClick}
         />
         <h1 className={styles.logoStyle} aria-label="GITLOG">
-          <GITLOG className="h-[28px] w-[67px]" aria-hidden="true" />
+          <GITLOG className="h-7 w-16.75" aria-hidden="true" />
         </h1>
       </div>
 
