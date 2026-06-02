@@ -1,46 +1,69 @@
 import { useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuthModal } from '@/hooks/useAuthModal';
+import { hasCompleteTokens, isRecord } from '@/api/types';
 import { useKakaoLoginMutation } from '@/hooks/queries/useAuth';
+import { useAuthStore } from '@/store/useAuthStore';
+
+const KAKAO_REGISTER_DRAFT_KEY = 'kakao-register-draft';
 
 const getKakaoRegisterDraft = (responseData: unknown) => {
-  if (
-    typeof responseData === 'object' &&
-    responseData !== null &&
-    'data' in responseData &&
-    typeof responseData.data === 'object' &&
-    responseData.data !== null
-  ) {
+  if (isRecord(responseData) && isRecord(responseData.data)) {
     return responseData.data;
   }
 
   return responseData;
 };
 
-const hasKakaoRegisterData = (data: {
-  kakaoId?: unknown;
-  id?: unknown;
-  oauthId?: unknown;
-  socialId?: unknown;
+const hasKakaoRegisterData = (data: unknown) => {
+  const draft = getKakaoRegisterDraft(data);
+
+  if (!isRecord(draft)) return false;
+
+  return Boolean(draft.kakaoId ?? draft.id ?? draft.oauthId ?? draft.socialId);
+};
+
+const getErrorResponse = (error: unknown) => {
+  if (!isRecord(error) || !isRecord(error.response)) return null;
+
+  return {
+    status: typeof error.response.status === 'number' ? error.response.status : undefined,
+    data: error.response.data,
+  };
+};
+
+const getResponseMessage = (data: unknown) => {
+  if (!isRecord(data) || typeof data.message !== 'string') return '';
+
+  return data.message;
+};
+
+const isKakaoRegisterRequiredResponse = ({
+  code,
+  message,
+  data,
+}: {
+  code?: number;
+  message?: string;
+  data: unknown;
 }) => {
-  return Boolean(data.kakaoId ?? data.id ?? data.oauthId ?? data.socialId);
+  return code === 404 || message?.toLowerCase().includes('not found') || hasKakaoRegisterData(data);
 };
 
 export const KakaoCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { openUnregistered } = useAuthModal();
+  const logout = useAuthStore((state) => state.logout);
   const kakaoLoginMutation = useKakaoLoginMutation();
   const { mutateAsync: loginWithKakao } = kakaoLoginMutation;
 
   const openKakaoRegister = useCallback((responseData: unknown) => {
+    logout();
     sessionStorage.setItem(
-      'kakao-register-draft',
+      KAKAO_REGISTER_DRAFT_KEY,
       JSON.stringify(getKakaoRegisterDraft(responseData)),
     );
-    navigate('/', { replace: true });
-    openUnregistered();
-  }, [navigate, openUnregistered]);
+    navigate('/register', { replace: true });
+  }, [logout, navigate]);
 
   useEffect(() => {
     const code = searchParams.get('code');
@@ -65,13 +88,9 @@ export const KakaoCallback = () => {
 
         if (!isSubscribed) return;
 
-        if (response.code === 0 && response.data.accessToken) {
+        if (response.code === 0 && hasCompleteTokens(response.data)) {
           navigate('/', { replace: true });
-        } else if (
-          hasKakaoRegisterData(response.data) ||
-          response.code === 404 ||
-          response.message.includes('not found')
-        ) {
+        } else if (isKakaoRegisterRequiredResponse(response)) {
           openKakaoRegister(response.data);
         } else {
           navigate('/', { replace: true });
@@ -80,17 +99,17 @@ export const KakaoCallback = () => {
         if (!isSubscribed) return;
         console.error('로그인 처리 중 에러:', error);
 
-        const responseData =
-          typeof error === 'object' &&
-          error !== null &&
-          'response' in error &&
-          typeof error.response === 'object' &&
-          error.response !== null &&
-          'data' in error.response
-            ? error.response.data
-            : null;
+        const errorResponse = getErrorResponse(error);
+        const responseData = errorResponse?.data;
 
-        if (responseData) {
+        if (
+          responseData &&
+          isKakaoRegisterRequiredResponse({
+            code: errorResponse.status,
+            message: getResponseMessage(responseData),
+            data: responseData,
+          })
+        ) {
           openKakaoRegister(responseData);
           return;
         }

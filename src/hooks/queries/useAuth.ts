@@ -6,10 +6,12 @@ import {
   registerUser,
   type RegisterRequest,
 } from '@/api/auth';
+import { hasCompleteTokens } from '@/api/types';
 import { getMyInfo } from '@/api/user';
 import { postKeys } from '@/hooks/queries/usePosts';
 import { userKeys } from '@/hooks/queries/useUserQueries';
 import { useAuthStore } from '@/store/useAuthStore';
+import { authStorage } from '@/utils/authStorage';
 
 const syncAuthUser = async (queryClient: ReturnType<typeof useQueryClient>) => {
   const response = await getMyInfo();
@@ -22,6 +24,12 @@ const syncAuthUser = async (queryClient: ReturnType<typeof useQueryClient>) => {
   queryClient.setQueryData(userKeys.me, response.data);
 };
 
+const clearAuthSession = (queryClient: ReturnType<typeof useQueryClient>) => {
+  authStorage.clear();
+  useAuthStore.getState().setUser(null);
+  queryClient.removeQueries({ queryKey: userKeys.me });
+};
+
 export const useEmailLoginMutation = () => {
   const queryClient = useQueryClient();
 
@@ -31,16 +39,20 @@ export const useEmailLoginMutation = () => {
     onSuccess: async (response) => {
       if (response.code !== 0) return;
 
-      localStorage.setItem('accessToken', response.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
-      localStorage.setItem('authProvider', 'EMAIL');
+      authStorage.setTokens(response.data.accessToken, response.data.refreshToken);
+      authStorage.setAuthProvider('EMAIL');
 
-      await syncAuthUser(queryClient);
+      try {
+        await syncAuthUser(queryClient);
 
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: userKeys.me }),
-        queryClient.invalidateQueries({ queryKey: postKeys.all }),
-      ]);
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: userKeys.me }),
+          queryClient.invalidateQueries({ queryKey: postKeys.all }),
+        ]);
+      } catch (error) {
+        clearAuthSession(queryClient);
+        throw error;
+      }
     },
   });
 };
@@ -51,23 +63,22 @@ export const useKakaoLoginMutation = () => {
   return useMutation({
     mutationFn: (code: string) => loginWithKakao(code),
     onSuccess: async (response) => {
-      if (response.code !== 0 || !('accessToken' in response.data)) return;
+      if (response.code !== 0 || !hasCompleteTokens(response.data)) return;
 
-      if (response.data.accessToken) {
-        localStorage.setItem('accessToken', response.data.accessToken);
+      authStorage.setTokens(response.data.accessToken, response.data.refreshToken);
+      authStorage.setAuthProvider('KAKAO');
+
+      try {
+        await syncAuthUser(queryClient);
+
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: userKeys.me }),
+          queryClient.invalidateQueries({ queryKey: postKeys.all }),
+        ]);
+      } catch (error) {
+        clearAuthSession(queryClient);
+        throw error;
       }
-
-      if (response.data.refreshToken) {
-        localStorage.setItem('refreshToken', response.data.refreshToken);
-      }
-      localStorage.setItem('authProvider', 'KAKAO');
-
-      await syncAuthUser(queryClient);
-
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: userKeys.me }),
-        queryClient.invalidateQueries({ queryKey: postKeys.all }),
-      ]);
     },
   });
 };

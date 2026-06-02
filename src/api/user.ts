@@ -1,10 +1,5 @@
-import { apiFetch, getAuthHeader } from '@/api/http';
-
-export interface BaseResponse<T> {
-  code: number;
-  message: string;
-  data: T;
-}
+import { apiFetch } from '@/api/http';
+import type { ApiResponse, EmptyResponseData } from '@/api/types';
 
 export interface UserData {
   id: number;
@@ -16,7 +11,7 @@ export interface UserData {
   introduction: string;
 }
 
-export type MyInfoResponse = BaseResponse<UserData>;
+export type MyInfoResponse = ApiResponse<UserData>;
 
 export type UpdateUserRequest = Pick<
   UserData,
@@ -25,24 +20,20 @@ export type UpdateUserRequest = Pick<
 
 export const updateMyInfo = async (
   data: Partial<UserData>,
-): Promise<BaseResponse<object>> => {
-  return apiFetch<BaseResponse<object>>('/users', {
+): Promise<ApiResponse<EmptyResponseData>> => {
+  return apiFetch<ApiResponse<EmptyResponseData>>('/users', {
     method: 'PATCH',
     body: data,
-    headers: getAuthHeader(),
   });
 };
 
-export const updatePassword = async (password: string): Promise<BaseResponse<object>> => {
-  return apiFetch<BaseResponse<object>>('/users/password', {
+export const updatePassword = async (password: string): Promise<ApiResponse<EmptyResponseData>> => {
+  return apiFetch<ApiResponse<EmptyResponseData>>('/users/password', {
     method: 'PATCH',
     body: { password },
-    headers: getAuthHeader(),
   });
 };
 
 export const getMyInfo = async (): Promise<MyInfoResponse> => {
-  return apiFetch<MyInfoResponse>('/users/me', {
-    headers: getAuthHeader(),
-  });
+  return apiFetch<MyInfoResponse>('/users/me');
 };

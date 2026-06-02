@@ -1,19 +1,11 @@
-import { apiFetch, getAuthHeader } from '@/api/http';
+import { apiFetch } from '@/api/http';
+import type { ApiResponse } from '@/api/types';
 
-export interface BaseResponse<T> {
-  code: number;
-  message: string;
-  data: T;
-}
-
-export type PresignedUrlResponse = BaseResponse<string>;
+export type PresignedUrlResponse = ApiResponse<string>;
 
 export const getPresignedUrl = async (fileName: string): Promise<PresignedUrlResponse> => {
-  const hasAccessToken = !!localStorage.getItem('accessToken');
-
   return apiFetch<PresignedUrlResponse>('/images/presigned-url', {
     params: { fileName },
-    headers: hasAccessToken ? getAuthHeader() : undefined,
   });
 };
 

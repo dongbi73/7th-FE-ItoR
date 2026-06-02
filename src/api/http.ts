@@ -3,6 +3,9 @@ import axios, {
   type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
 } from 'axios';
+import type { ApiResponse } from '@/api/types';
+import { authStorage } from '@/utils/authStorage';
+import { redirectToLogin } from '@/utils/redirect';
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '');
 
@@ -13,14 +16,10 @@ interface ApiFetchOptions extends Omit<AxiosRequestConfig, 'data' | 'url' | 'par
   body?: unknown;
 }
 
-interface TokenReissueResponse {
-  code: number;
-  message: string;
-  data: {
-    accessToken: string;
-    refreshToken: string;
-  };
-}
+type TokenReissueResponse = ApiResponse<{
+  accessToken: string;
+  refreshToken: string;
+}>;
 
 interface RetriableRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
@@ -39,10 +38,6 @@ export const createApiUrl = (path: string, params?: Record<string, QueryValue>) 
   return url.toString();
 };
 
-export const getAuthHeader = () => ({
-  Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-});
-
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
 });
@@ -53,8 +48,14 @@ const authClient = axios.create({
 
 let reissuePromise: Promise<TokenReissueResponse> | null = null;
 
+export const expireAuthSession = () => {
+  authStorage.clear();
+  window.dispatchEvent(new Event('auth:expired'));
+  redirectToLogin();
+};
+
 export const requestTokenReissue = async (): Promise<TokenReissueResponse> => {
-  const refreshToken = localStorage.getItem('refreshToken');
+  const refreshToken = authStorage.getRefreshToken();
 
   if (!refreshToken) {
     throw new Error('Refresh token is missing');
@@ -64,8 +65,7 @@ export const requestTokenReissue = async (): Promise<TokenReissueResponse> => {
     .post<TokenReissueResponse>('/auth/reissue', { refreshToken })
     .then((response) => {
       if (response.data.code === 0) {
-        localStorage.setItem('accessToken', response.data.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.data.refreshToken);
+        authStorage.setTokens(response.data.data.accessToken, response.data.data.refreshToken);
       }
 
       return response.data;
@@ -77,18 +77,8 @@ export const requestTokenReissue = async (): Promise<TokenReissueResponse> => {
   return reissuePromise;
 };
 
-const clearAuthAndRedirect = () => {
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
-  window.dispatchEvent(new Event('auth:expired'));
-
-  if (window.location.pathname !== '/login') {
-    window.location.assign('/login');
-  }
-};
-
 apiClient.interceptors.request.use((config) => {
-  const accessToken = localStorage.getItem('accessToken');
+  const accessToken = authStorage.getAccessToken();
 
   if (accessToken && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${accessToken}`;
@@ -124,7 +114,7 @@ apiClient.interceptors.response.use(
 
       return apiClient(originalRequest);
     } catch (reissueError) {
-      clearAuthAndRedirect();
+      expireAuthSession();
       return Promise.reject(reissueError);
     }
   },

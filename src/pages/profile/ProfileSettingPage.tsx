@@ -16,6 +16,8 @@ import {
   useUpdateMyInfoMutation,
   useUpdatePasswordMutation,
 } from '@/hooks/queries/useUserQueries';
+import { useAuthStatus } from '@/hooks/useAuthStatus';
+import { authStorage } from '@/utils/authStorage';
 
 const toFormValues = (user: UserData): Partial<UserFormValues> => ({
   email: user.email || '',
@@ -38,7 +40,8 @@ const ProfileSettingPage = () => {
   const { values, errors, setFieldValue, resetForm, validateForm } = useUserForm({
     mode: 'profileEdit',
   });
-  const { data: myInfo, isError } = useMeQuery();
+  const { isLoggedIn } = useAuthStatus();
+  const { data: myInfo, isError } = useMeQuery({ enabled: isLoggedIn });
   const updateMyInfoMutation = useUpdateMyInfoMutation();
   const updatePasswordMutation = useUpdatePasswordMutation();
   const { uploadImageFile } = useImageUpload({
@@ -49,7 +52,7 @@ const ProfileSettingPage = () => {
     },
   });
 
-  const isKakao = localStorage.getItem('authProvider') === 'KAKAO';
+  const isKakao = authStorage.isKakaoProvider();
 
   useEffect(() => {
     if (!myInfo) return;
@@ -59,10 +62,12 @@ const ProfileSettingPage = () => {
   }, [myInfo, resetForm]);
 
   useEffect(() => {
-    if (isError) {
-      navigate('/login');
+    if (!isLoggedIn || isError) {
+      navigate('/login', { replace: true });
     }
-  }, [isError, navigate]);
+  }, [isLoggedIn, isError, navigate]);
+
+  if (!isLoggedIn) return null;
 
   const handleCancel = () => {
     if (!user) return;

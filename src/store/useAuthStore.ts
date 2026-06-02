@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import type { UserData } from '@/api/user';
+import { queryClient } from '@/lib/queryClient';
+import { authStorage } from '@/utils/authStorage';
 
 interface AuthState {
   user: UserData | null;
@@ -14,9 +16,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   setUser: (user) => set({ user, isLoggedIn: !!user }),
 
   logout: () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('authProvider');
+    authStorage.clear();
+    queryClient.removeQueries({ queryKey: ['user'] });
 
     set({ user: null, isLoggedIn: false });
   },

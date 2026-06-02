@@ -12,6 +12,7 @@ import { useUserForm } from '@/hooks/useUserForm';
 import { useToast } from '@/hooks/useToast';
 import { useRegisterMutation } from '@/hooks/queries/useAuth';
 import { useImageUpload } from '@/hooks/useImageUpload';
+import { redirectTo } from '@/utils/redirect';
 
 type Step = 'select' | 'form' | 'kakaoForm';
 
@@ -112,7 +113,7 @@ const RegisterPage = () => {
       return;
     }
 
-    window.location.href = getKakaoLoginUrl();
+    redirectTo(getKakaoLoginUrl());
   };
 
   const handleSubmit = async (event?: React.FormEvent<HTMLFormElement>) => {

@@ -1,10 +1,5 @@
-import { apiFetch, getAuthHeader } from '@/api/http';
-
-interface BaseResponse<T> {
-  code: number;
-  message: string;
-  data: T;
-}
+import { apiFetch } from '@/api/http';
+import type { ApiResponse, EmptyResponseData } from '@/api/types';
 
 interface CommentPayload {
   content: string;
@@ -13,28 +8,25 @@ interface CommentPayload {
 export const createComment = async (
   postId: string,
   payload: CommentPayload,
-): Promise<BaseResponse<object>> => {
-  return apiFetch<BaseResponse<object>>(`/comments/${postId}`, {
+): Promise<ApiResponse<EmptyResponseData>> => {
+  return apiFetch<ApiResponse<EmptyResponseData>>(`/comments/${postId}`, {
     method: 'POST',
     body: payload,
-    headers: getAuthHeader(),
   });
 };
 
 export const updateComment = async (
   commentId: number,
   payload: CommentPayload,
-): Promise<BaseResponse<object>> => {
-  return apiFetch<BaseResponse<object>>(`/comments/${commentId}`, {
+): Promise<ApiResponse<EmptyResponseData>> => {
+  return apiFetch<ApiResponse<EmptyResponseData>>(`/comments/${commentId}`, {
     method: 'PATCH',
     body: payload,
-    headers: getAuthHeader(),
   });
 };
 
-export const deleteComment = async (commentId: number): Promise<BaseResponse<object>> => {
-  return apiFetch<BaseResponse<object>>(`/comments/${commentId}`, {
+export const deleteComment = async (commentId: number): Promise<ApiResponse<EmptyResponseData>> => {
+  return apiFetch<ApiResponse<EmptyResponseData>>(`/comments/${commentId}`, {
     method: 'DELETE',
-    headers: getAuthHeader(),
   });
 };

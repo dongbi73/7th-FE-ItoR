@@ -1,14 +1,9 @@
-import { apiFetch, createApiUrl, requestTokenReissue } from '@/api/http';
+import { apiFetch, createApiUrl, expireAuthSession, requestTokenReissue } from '@/api/http';
+import type { ApiResponse } from '@/api/types';
 
 export interface ReissueData {
   accessToken: string;
   refreshToken: string;
-}
-
-export interface BaseResponse<T> {
-  code: number;
-  message: string;
-  data: T;
 }
 
 export interface LoginData {
@@ -53,20 +48,18 @@ export interface KakaoRedirectData {
   responseMessage: string;
 }
 
-export type ReissueResponse = BaseResponse<ReissueData>;
-export type LoginResponse = BaseResponse<LoginData>;
-export type KakaoLoginUrlResponse = BaseResponse<string>;
-export type KakaoRedirectResponse = BaseResponse<KakaoRedirectData>;
-export type RegisterResponse = BaseResponse<RegisterData>;
+export type ReissueResponse = ApiResponse<ReissueData>;
+export type LoginResponse = ApiResponse<LoginData>;
+export type KakaoLoginUrlResponse = ApiResponse<string>;
+export type KakaoRedirectResponse = ApiResponse<KakaoRedirectData>;
+export type RegisterResponse = ApiResponse<RegisterData>;
 
 export const reissueToken = async (): Promise<ReissueResponse> => {
   try {
     return await requestTokenReissue();
   } catch (error) {
     console.error('토큰 재발급 실패:', error);
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    window.location.href = '/login';
+    expireAuthSession();
 
     return {
       code: 401,

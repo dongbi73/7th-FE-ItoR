@@ -36,7 +36,6 @@ export const router = createBrowserRouter([
       { path: '/auth/kakao/callback', element: withSuspense(<KakaoCallback />) },
       { path: 'login', element: withSuspense(<LoginPage />) },
       { path: 'profile/me', element: withSuspense(<ProfilePage />) },
-      { path: 'profile/:profileUserId', element: withSuspense(<ProfilePage />) },
       { path: 'profile/me/settings', element: withSuspense(<ProfileSettingPage />) },
     ],
   },

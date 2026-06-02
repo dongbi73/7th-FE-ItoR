@@ -1,9 +1,9 @@
 import { useAuthStore } from '@/store/useAuthStore';
+import { authStorage } from '@/utils/authStorage';
 
 export const useAuthStatus = () => {
   const authUser = useAuthStore((state) => state.user);
-  const hasAccessToken =
-    typeof localStorage !== 'undefined' && !!localStorage.getItem('accessToken');
+  const hasAccessToken = authStorage.hasAccessToken();
 
   return {
     authUser,

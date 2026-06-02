@@ -1,4 +1,5 @@
-import { apiFetch, getAuthHeader } from '@/api/http';
+import { apiFetch } from '@/api/http';
+import type { ApiResponse } from '@/api/types';
 import type { PostRequestBody } from '@/utils/postRequest';
 
 export { createPostRequestBody } from '@/utils/postRequest';
@@ -7,12 +8,6 @@ export type {
   PostRequestBody,
   PostRequestContent,
 } from '@/utils/postRequest';
-
-export interface BaseResponse<T> {
-  code: number;
-  message: string;
-  data: T;
-}
 
 export interface PostContent {
   contentOrder: number;
@@ -35,7 +30,7 @@ export interface PostListData {
   pageMax: number;
 }
 
-export type PostListResponse = BaseResponse<PostListData>;
+export type PostListResponse = ApiResponse<PostListData>;
 
 export interface PostDetail {
   postId: string;
@@ -58,8 +53,8 @@ export interface Comment {
   isOwner: boolean;
 }
 
-export type PostDetailResponse = BaseResponse<PostDetail>;
-export type PostMutationResponse = BaseResponse<{
+export type PostDetailResponse = ApiResponse<PostDetail>;
+export type PostMutationResponse = ApiResponse<{
   id?: string;
   postId?: string;
 }>;
@@ -73,7 +68,6 @@ export const getPost = async (postId: string): Promise<PostDetailResponse> => {
 export const getPostWithToken = async (postId: string): Promise<PostDetailResponse> => {
   return apiFetch<PostDetailResponse>('/posts/token', {
     params: { postId },
-    headers: getAuthHeader(),
   });
 };
 
@@ -89,7 +83,6 @@ export const getPostListWithToken = async (
 ): Promise<PostListResponse> => {
   return apiFetch<PostListResponse>('/posts/all/token', {
     params: { size, page },
-    headers: getAuthHeader(),
   });
 };
 
@@ -97,7 +90,6 @@ export const postBoard = async (body: PostRequestBody): Promise<PostMutationResp
   return apiFetch<PostMutationResponse>('/posts', {
     method: 'POST',
     body,
-    headers: getAuthHeader(),
   });
 };
 
@@ -109,7 +101,6 @@ export const updatePost = async (
     method: 'PATCH',
     params: { postId },
     body,
-    headers: getAuthHeader(),
   });
 };
 
@@ -117,6 +108,5 @@ export const deletePost = async (postId: string): Promise<PostMutationResponse> 
   return apiFetch<PostMutationResponse>('/posts', {
     method: 'DELETE',
     params: { postId },
-    headers: getAuthHeader(),
   });
 };

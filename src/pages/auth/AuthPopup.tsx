@@ -7,6 +7,7 @@ import { TextField } from '@/components/common/TextField';
 import { getKakaoLoginUrl } from '@/api/auth';
 import { useEmailLoginMutation } from '@/hooks/queries/useAuth';
 import { useToast } from '@/hooks/useToast';
+import { redirectTo } from '@/utils/redirect';
 
 interface LoginFormValues {
   email: string;
@@ -40,8 +41,6 @@ export const AuthPopup = ({ onClose, onUnregistered }: AuthPopupProps) => {
       });
 
       if (response.code === 0) {
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
         navigate('/');
         onClose?.();
       } else if (response.code === 404 || response.message.includes('not found')) {
@@ -64,7 +63,7 @@ export const AuthPopup = ({ onClose, onUnregistered }: AuthPopupProps) => {
   const handleKakaoLogin = () => {
     try {
       const loginUrl = getKakaoLoginUrl();
-      window.location.href = loginUrl;
+      redirectTo(loginUrl);
     } catch (error) {
       console.error('카카오 로그인 이동 실패:', error);
       showToast({ type: 'error', message: '카카오 로그인 페이지로 이동하지 못했습니다.' });
