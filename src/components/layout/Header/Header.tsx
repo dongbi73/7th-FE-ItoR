@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ReorderIcon } from '@/assets/icons';
+import { GITLOG, ReorderIcon } from '@/assets/icons';
 import { IconButton } from '@/components/common/IconButton';
 import { ProfileCard } from '@/components/common/ProfileCard';
 import { useAuthModal } from '@/hooks/useAuthModal';
@@ -67,7 +67,9 @@ export const Header = ({
           aria-label="마이페이지"
           onClick={handleMenuClick}
         />
-        <h1 className={styles.logoStyle}>GITLOG</h1>
+        <h1 className={styles.logoStyle} aria-label="GITLOG">
+          <GITLOG className="h-[28px] w-[67px]" aria-hidden="true" />
+        </h1>
       </div>
 
       {isProfileOpen && (
